@@ -26,6 +26,8 @@ public interface CourseMapper {
 
     ChapterResponse toChapter(Chapter chapter, @Context Set<Long> completedLessonIds);
 
-    @Mapping(target = "completed", expression = "java(completedLessonIds.contains(lesson.getId()))")
+    /** The id check matters: Set.of() throws on contains(null), and a just-added lesson has no id. */
+    @Mapping(target = "completed",
+            expression = "java(lesson.getId() != null && completedLessonIds.contains(lesson.getId()))")
     LessonResponse toLesson(Lesson lesson, @Context Set<Long> completedLessonIds);
 }
