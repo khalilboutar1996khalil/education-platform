@@ -1,0 +1,12 @@
+# Automated tests (./gradlew test). Uses a separate database so tests never touch your dev data.
+
+spring:
+  datasource:
+    url: ${TEST_DB_URL:jdbc:postgresql://localhost:5432/eduflow_test}
+    username: ${TEST_DB_USERNAME:eduflow}
+    password: ${TEST_DB_PASSWORD:eduflow}
+
+management:
+  endpoint:
+    health:
+      show-details: always

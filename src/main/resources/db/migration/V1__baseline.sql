@@ -1,0 +1,3 @@
+-- Baseline: starting point of the database history managed by Flyway.
+-- Each later schema change is a new file: V2__create_users.sql, V3__create_courses.sql, …
+-- Never edit a migration that has already run; add a new one instead.

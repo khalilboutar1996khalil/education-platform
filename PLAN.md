@@ -10,7 +10,7 @@ We build **one step at a time**: each step is reviewed and tested in Swagger bef
 | Area | Choice |
 |---|---|
 | Language / framework | Java 21, Spring Boot 4.1, Gradle |
-| Database | PostgreSQL (prod/dev), H2 only as a fallback |
+| Database | PostgreSQL everywhere: `eduflow` (dev), `eduflow_test` (tests), env-configured (prod) |
 | Migrations | Flyway |
 | Persistence | Spring Data JPA (Hibernate) |
 | Mapping | MapStruct (+ Lombok binding) |
@@ -83,12 +83,13 @@ com.example.education_platform
 Legend: `[ ]` todo · `[x]` done
 
 ### Step 0 — Project setup
-- [ ] Initialise git, update `.gitignore`, first commit
-- [ ] Add dependencies: springdoc-openapi, MapStruct, Flyway, Actuator, JaCoCo, Checkstyle, Sonar plugin
-- [ ] Profiles: `dev`, `test`, `prod` (`application-*.yml`), secrets via env variables (`.env.example`)
+- [x] Initialise git, update `.gitignore`, first commit
+- [x] Add dependencies: springdoc-openapi, MapStruct, Flyway, Actuator, JaCoCo, Checkstyle, Sonar plugin
+- [x] Profiles: `dev`, `test`, `prod` (`application-*.yml`), secrets via env variables (`.env.example`)
 - [x] PostgreSQL running locally, `eduflow` database created
-- [ ] SonarQube config in `build.gradle` (ready to connect)
-- **Done when:** `./gradlew build` passes and the app starts on PostgreSQL.
+- [x] SonarQube config in `build.gradle` (ready to connect)
+- [x] README with run & test instructions
+- **Done when:** `./gradlew build` passes and the app starts on PostgreSQL. ✅
 
 ### Step 1 — Core (common)
 - [ ] `BaseEntity` (id, createdAt, updatedAt, createdBy, updatedBy) + JPA auditing

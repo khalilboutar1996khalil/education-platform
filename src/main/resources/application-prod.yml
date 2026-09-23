@@ -1,0 +1,17 @@
+# Production. Every secret must come from environment variables — there are no defaults here,
+# so the app refuses to start if one is missing.
+
+management:
+  endpoint:
+    health:
+      show-details: never
+
+springdoc:
+  api-docs:
+    enabled: false               # do not publish the API description publicly
+  swagger-ui:
+    enabled: false
+
+logging:
+  level:
+    root: INFO
