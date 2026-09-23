@@ -1,0 +1,49 @@
+# Shared settings for every profile. Profile files (application-<profile>.yml) override these.
+# Active profile: "dev" by default; set SPRING_PROFILES_ACTIVE=prod in production.
+
+spring:
+  application:
+    name: education-platform
+  profiles:
+    default: dev
+  config:
+    # Local secrets (DB password, JWT key…) live in a git-ignored .env file — see .env.example
+    import: optional:file:.env[.properties]
+
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    open-in-view: false          # no lazy loading from controllers — avoids hidden N+1 queries
+    hibernate:
+      ddl-auto: validate         # Flyway owns the schema; Hibernate only checks it matches
+    properties:
+      hibernate.jdbc.time_zone: UTC
+
+  flyway:
+    locations: classpath:db/migration
+
+server:
+  port: ${SERVER_PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: EduFlow
+    description: Education platform backend
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
