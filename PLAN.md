@@ -124,11 +124,16 @@ resets on restart and is not shared between instances.
 - **Done when:** the Modules and module-detail screens can be fully fed by the API. ✅
 
 ### Step 4 — Quiz
-- [ ] Entities `Quiz`, `Question`, `Choice`, `QuizAttempt`, `Answer` + migration
-- [ ] Admin: create/edit quiz, statuses (DRAFT / IN_PROGRESS / CLOSED), deadline, duration
-- [ ] Student: start attempt, submit answers, automatic scoring
-- [ ] Stats: submissions, average score
-- [ ] Tests
+- [x] Entities `Quiz`, `Question`, `Choice`, `QuizAttempt`, `Answer` + migration
+- [x] Admin: create/edit quiz, statuses (DRAFT / IN_PROGRESS / CLOSED), deadline, duration
+- [x] Student: start attempt, submit answers, automatic scoring
+- [x] Stats: submissions, average score
+- [x] Tests
+
+Carried into later steps: an expired attempt is written off the next time it is touched, since
+the `@Scheduled` auto-close job only arrives in Step 9; open questions are stored but not yet
+markable by hand; and `lessons.quiz_id` is still unwired, so a QUIZ lesson does not link to its
+quiz until a screen needs it.
 
 ### Step 5 — TP & devoirs, submissions, corrections, file storage
 - [ ] `StorageService` interface + local-disk implementation, file validation (type, size, name)

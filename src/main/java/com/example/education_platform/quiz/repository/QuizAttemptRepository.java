@@ -21,6 +21,11 @@ public interface QuizAttemptRepository extends JpaRepository<QuizAttempt, Long> 
 
     long countByQuizIdAndStudentId(Long quizId, Long studentId);
 
+    @Query("""
+            select a.quiz.id as quizId, count(a) as total from QuizAttempt a
+            where a.student.id = :studentId group by a.quiz.id""")
+    List<QuizCount> countPerQuizForStudent(@Param("studentId") Long studentId);
+
     /** Stats line on the admin's quiz screen: how many handed in, and the average of their scores. */
     @Query("""
             select count(a) as submissions, avg(a.score) as averageScore from QuizAttempt a
