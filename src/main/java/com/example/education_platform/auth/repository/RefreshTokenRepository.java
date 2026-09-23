@@ -12,8 +12,12 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
 
     Optional<RefreshToken> findByTokenHash(String tokenHash);
 
-    /** Used by logout-everywhere and, later, by a password change. */
-    @Modifying
+    /**
+     * Used when disabling an account and when changing a password. A bulk update bypasses the
+     * persistence context, so without these flags an already-loaded token would still look active
+     * to the rest of the same transaction.
+     */
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("update RefreshToken t set t.revokedAt = :now where t.user.id = :userId and t.revokedAt is null")
     int revokeAllForUser(@Param("userId") Long userId, @Param("now") Instant now);
 }
