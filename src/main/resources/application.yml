@@ -58,5 +58,9 @@ app:
     secret: ${JWT_SECRET}
     access-token-ttl: 15m     # short: an access token cannot be revoked
     refresh-token-ttl: 30d    # long: revocable through the refresh_tokens table
+  security:
+    login:
+      max-failures: 5     # consecutive failures tolerated per email address
+      lockout: 15m
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}

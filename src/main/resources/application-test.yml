@@ -7,6 +7,11 @@ spring:
     password: ${TEST_DB_PASSWORD:eduflow}
 
 app:
+  security:
+    login:
+      # Effectively disabled: the dedicated rate-limit test lowers it with @TestPropertySource.
+      max-failures: 1000
+      lockout: 1m
   jwt:
     # Fixed test key so tests never depend on the environment.
     secret: ZWR1Zmxvdy1sb2NhbC1kZXYtb25seS1rZXktbm90LWEtc2VjcmV0LTAwMDAwMA==

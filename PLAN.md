@@ -101,14 +101,18 @@ Legend: `[ ]` todo · `[x]` done
 - **Done when:** Swagger UI opens at `/swagger-ui.html` and errors return the standard format. ✅
 
 ### Step 2 — Auth, users & profile
-- [ ] `User` entity (role ADMIN/STUDENT, level 2AS/3AS, status) + Flyway migration
-- [ ] Login → access + refresh token; refresh; logout
-- [ ] Rate limiting on login
-- [ ] Admin: invite student, list/filter students (paginated), change status
-- [ ] Me: get/update profile, change password, preferences
-- [ ] Ownership checks helper (student sees only own data)
-- [ ] Unit + integration tests
-- **Done when:** admin and student can log in from Swagger and see only what they are allowed to.
+- [x] `User` entity (role ADMIN/STUDENT, level 2AS/3AS, status) + Flyway migration
+- [x] Login → access + refresh token; refresh; logout
+- [x] Rate limiting on login
+- [x] Admin: invite student, list/filter students (paginated), change status
+- [x] Me: get/update profile, change password, preferences
+- [x] Ownership checks helper (student sees only own data)
+- [x] Unit + integration tests
+- **Done when:** admin and student can log in from Swagger and see only what they are allowed to. ✅
+
+Carried into later steps: the invitation returns a one-time temporary password instead of
+sending mail (Step 9 adds the email service), and login rate limiting is in-memory, so it
+resets on restart and is not shared between instances.
 
 ### Step 3 — Modules, chapters, lessons & progress
 - [ ] Entities `Course`, `Chapter`, `Lesson`, `LessonCompletion` + migration

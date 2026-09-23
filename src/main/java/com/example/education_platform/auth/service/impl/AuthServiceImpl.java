@@ -8,6 +8,7 @@ import com.example.education_platform.auth.repository.RefreshTokenRepository;
 import com.example.education_platform.auth.service.AuthService;
 import com.example.education_platform.common.exception.InvalidRefreshTokenException;
 import com.example.education_platform.security.JwtProperties;
+import com.example.education_platform.security.LoginRateLimiter;
 import com.example.education_platform.security.TokenService;
 import com.example.education_platform.user.entity.User;
 import com.example.education_platform.user.entity.UserStatus;
@@ -21,6 +22,7 @@ import java.time.Instant;
 import java.util.Base64;
 import java.util.HexFormat;
 import java.util.Locale;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,16 +41,25 @@ public class AuthServiceImpl implements AuthService {
     private final TokenService tokenService;
     private final JwtProperties jwtProperties;
     private final UserMapper userMapper;
+    private final LoginRateLimiter rateLimiter;
 
     @Override
     @Transactional
     public LoginResponse login(LoginRequest request, String userAgent, String ipAddress) {
-        User user = users.findByEmail(normalise(request.email()))
-                .filter(candidate -> passwordEncoder.matches(request.password(), candidate.getPasswordHash()))
-                .filter(candidate -> candidate.getStatus() != UserStatus.DISABLED)
-                // One message for every failure, so the response cannot be used to discover accounts
-                .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
+        String email = normalise(request.email());
+        rateLimiter.checkAllowed(email);
 
+        Optional<User> found = users.findByEmail(email)
+                .filter(candidate -> passwordEncoder.matches(request.password(), candidate.getPasswordHash()))
+                .filter(candidate -> candidate.getStatus() != UserStatus.DISABLED);
+        if (found.isEmpty()) {
+            rateLimiter.recordFailure(email);
+            // One message for every failure, so the response cannot be used to discover accounts
+            throw new BadCredentialsException("Invalid email or password");
+        }
+
+        User user = found.get();
+        rateLimiter.recordSuccess(email);
         return new LoginResponse(issueTokens(user, userAgent, ipAddress), userMapper.toResponse(user));
     }
 
