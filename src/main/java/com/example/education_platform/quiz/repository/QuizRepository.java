@@ -21,7 +21,11 @@ public interface QuizRepository extends JpaRepository<Quiz, Long> {
     @EntityGraph(attributePaths = "questions")
     Optional<Quiz> findDetailById(Long id);
 
-    /** A student passes their own level and the statuses they are allowed to see. */
+    /**
+     * A student passes their own level and the statuses they are allowed to see. The course is
+     * fetched because every row renders its module code.
+     */
+    @EntityGraph(attributePaths = "course")
     @Query("""
             select q from Quiz q
             where (:level is null or q.course.level = :level)
