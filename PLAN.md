@@ -92,13 +92,13 @@ Legend: `[ ]` todo · `[x]` done
 - **Done when:** `./gradlew build` passes and the app starts on PostgreSQL. ✅
 
 ### Step 1 — Core (common)
-- [ ] `BaseEntity` (id, createdAt, updatedAt, createdBy, updatedBy) + JPA auditing
-- [ ] Soft delete support
-- [ ] Exceptions (`ResourceNotFoundException`, `BusinessException`, …) + `GlobalExceptionHandler` (ProblemDetail)
-- [ ] `PageResponse<T>`
-- [ ] i18n messages (`messages_fr.properties`)
-- [ ] Swagger config (title, version, JWT "Authorize" button)
-- **Done when:** Swagger UI opens at `/swagger-ui.html` and errors return the standard format.
+- [x] `BaseEntity` (id, createdAt, updatedAt, createdBy, updatedBy) + JPA auditing
+- [x] Soft delete support
+- [x] Exceptions (`ResourceNotFoundException`, `BusinessException`, …) + `GlobalExceptionHandler` (ProblemDetail)
+- [x] `PageResponse<T>`
+- [x] i18n messages (`messages_fr.properties`)
+- [x] Swagger config (title, version, JWT "Authorize" button)
+- **Done when:** Swagger UI opens at `/swagger-ui.html` and errors return the standard format. ✅
 
 ### Step 2 — Auth, users & profile
 - [ ] `User` entity (role ADMIN/STUDENT, level 2AS/3AS, status) + Flyway migration

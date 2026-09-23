@@ -44,6 +44,15 @@ class SetupSmokeTest {
     }
 
     @Test
+    void swaggerDocsExposeTheJwtBearerScheme() {
+        assertThat(mvc.get().uri("/v3/api-docs"))
+                .hasStatusOk()
+                .bodyJson()
+                .satisfies(json -> json.assertThat()
+                        .extractingPath("$.components.securitySchemes.bearerAuth.scheme").isEqualTo("bearer"));
+    }
+
+    @Test
     void otherEndpointsRequireAuthentication() {
         assertThat(mvc.get().uri("/api/v1/anything")).hasStatus(401);
     }
