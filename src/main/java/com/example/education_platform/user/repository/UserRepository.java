@@ -17,6 +17,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByEmail(String email);
 
+    /** Denominator of a module's class average. */
+    long countByRoleAndLevelAndStatus(Role role, Level level, UserStatus status);
+
     /** Every filter is optional; a null one drops out of the predicate rather than matching nothing. */
     @Query("""
             select u from User u
