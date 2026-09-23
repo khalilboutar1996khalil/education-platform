@@ -11,6 +11,11 @@ management:
     health:
       show-details: always       # shows database status on /actuator/health
 
+app:
+  jwt:
+    # Local development only — this key is public, in the repo, and must never reach production.
+    secret: ${JWT_SECRET:ZWR1Zmxvdy1sb2NhbC1kZXYtb25seS1rZXktbm90LWEtc2VjcmV0LTAwMDAwMA==}
+
 logging:
   level:
     com.example.education_platform: DEBUG

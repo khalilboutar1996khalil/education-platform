@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
+import java.util.Locale;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -56,5 +57,17 @@ public class User extends BaseEntity {
         this.passwordHash = passwordHash;
         this.role = role;
         this.level = level;
+    }
+
+    public boolean isAdmin() {
+        return role == Role.ADMIN;
+    }
+
+    /** Avatar initials shown throughout the UI, e.g. "Amira Benali" becomes "AB". */
+    public String getInitials() {
+        String[] parts = fullName.trim().split("\\s+");
+        String first = parts[0].substring(0, 1);
+        String last = parts.length > 1 ? parts[parts.length - 1].substring(0, 1) : "";
+        return (first + last).toUpperCase(Locale.ROOT);
     }
 }

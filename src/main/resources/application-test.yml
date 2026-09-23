@@ -6,6 +6,13 @@ spring:
     username: ${TEST_DB_USERNAME:eduflow}
     password: ${TEST_DB_PASSWORD:eduflow}
 
+app:
+  jwt:
+    # Fixed test key so tests never depend on the environment.
+    secret: ZWR1Zmxvdy1sb2NhbC1kZXYtb25seS1rZXktbm90LWEtc2VjcmV0LTAwMDAwMA==
+    access-token-ttl: 15m
+    refresh-token-ttl: 1d
+
 management:
   endpoint:
     health:

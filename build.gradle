@@ -32,6 +32,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    // JWT: Spring Security's own Nimbus encoder/decoder — no third-party JWT library
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 
     // Database migrations
     implementation 'org.springframework.boot:spring-boot-starter-flyway'
