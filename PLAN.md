@@ -115,13 +115,13 @@ sending mail (Step 9 adds the email service), and login rate limiting is in-memo
 resets on restart and is not shared between instances.
 
 ### Step 3 — Modules, chapters, lessons & progress
-- [ ] Entities `Course`, `Chapter`, `Lesson`, `LessonCompletion` + migration
-- [ ] CRUD modules / chapters / lessons (admin), ordering by position
-- [ ] Students see only their level; mark lesson done / undone
-- [ ] Progress % per student and class average per module
-- [ ] Demo seed data (dev profile) from the design
-- [ ] Tests
-- **Done when:** the Modules and module-detail screens can be fully fed by the API.
+- [x] Entities `Course`, `Chapter`, `Lesson`, `LessonCompletion` + migration
+- [x] CRUD modules / chapters / lessons (admin), ordering by position
+- [x] Students see only their level; mark lesson done / undone
+- [x] Progress % per student and class average per module
+- [x] Demo seed data (dev profile) from the design
+- [x] Tests
+- **Done when:** the Modules and module-detail screens can be fully fed by the API. ✅
 
 ### Step 4 — Quiz
 - [ ] Entities `Quiz`, `Question`, `Choice`, `QuizAttempt`, `Answer` + migration
