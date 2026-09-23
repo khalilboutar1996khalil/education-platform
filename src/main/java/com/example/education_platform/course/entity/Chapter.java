@@ -1,6 +1,8 @@
 package com.example.education_platform.course.entity;
 
 import com.example.education_platform.common.BaseEntity;
+import com.example.education_platform.common.Positioned;
+import com.example.education_platform.common.Positions;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -1,6 +1,7 @@
 package com.example.education_platform.course.entity;
 
 import com.example.education_platform.common.BaseEntity;
+import com.example.education_platform.common.Positioned;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

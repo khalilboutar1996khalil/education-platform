@@ -1,7 +1,7 @@
-package com.example.education_platform.course.entity;
+package com.example.education_platform.common;
 
 /** A child whose order inside its parent is stored, not derived. */
-interface Positioned {
+public interface Positioned {
 
     void setPosition(int position);
 }
