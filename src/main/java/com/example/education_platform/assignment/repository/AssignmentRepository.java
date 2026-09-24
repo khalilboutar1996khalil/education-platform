@@ -49,4 +49,20 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
                                   Pageable pageable);
 
     long countByStatus(AssignmentStatus status);
+
+    /** Work falling due inside a window; the reminder job walks these. */
+    @EntityGraph(attributePaths = "course")
+    @Query("""
+            select a from Assignment a
+            where a.status = :status and a.deadline between :from and :to
+            order by a.deadline
+            """)
+    List<Assignment> findWithDeadlineBetween(@Param("status") AssignmentStatus status,
+                                             @Param("from") Instant from,
+                                             @Param("to") Instant to,
+                                             Pageable pageable);
+
+    /** Still open although the deadline has gone; the job closes the ones that forbid late work. */
+    @Query("select a from Assignment a where a.status = :status and a.deadline is not null and a.deadline <= :now")
+    List<Assignment> findOverdue(@Param("status") AssignmentStatus status, @Param("now") Instant now);
 }

@@ -53,4 +53,8 @@ public interface QuizRepository extends JpaRepository<Quiz, Long> {
                             Pageable pageable);
 
     long countByStatus(QuizStatus status);
+
+    /** Still open although the deadline has gone; the scheduled job closes these. */
+    @Query("select q from Quiz q where q.status = :status and q.deadline is not null and q.deadline <= :now")
+    List<Quiz> findOverdue(@Param("status") QuizStatus status, @Param("now") Instant now);
 }

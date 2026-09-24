@@ -7,6 +7,9 @@ spring:
     password: ${TEST_DB_PASSWORD:eduflow}
 
 app:
+  # A job firing mid-test would move data under an assertion
+  jobs:
+    enabled: false
   storage:
     # A throwaway directory, so tests never write into the dev uploads
     location: ${java.io.tmpdir}/eduflow-test-uploads

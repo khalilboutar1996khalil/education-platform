@@ -21,6 +21,10 @@ public interface QuizAttemptRepository extends JpaRepository<QuizAttempt, Long> 
 
     long countByQuizIdAndStudentId(Long quizId, Long studentId);
 
+    /** Attempts left running; the job decides which have actually run out of time. */
+    @EntityGraph(attributePaths = "quiz")
+    List<QuizAttempt> findByStatus(AttemptStatus status);
+
     @Query("""
             select a.quiz.id as quizId, count(a) as total from QuizAttempt a
             where a.student.id = :studentId group by a.quiz.id""")
