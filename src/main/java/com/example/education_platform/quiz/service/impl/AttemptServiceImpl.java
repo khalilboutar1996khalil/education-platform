@@ -16,6 +16,7 @@ import com.example.education_platform.quiz.entity.QuestionType;
 import com.example.education_platform.quiz.entity.Quiz;
 import com.example.education_platform.quiz.entity.QuizAttempt;
 import com.example.education_platform.quiz.entity.QuizStatus;
+import com.example.education_platform.quiz.event.QuizAttemptGraded;
 import com.example.education_platform.quiz.mapper.AttemptMapper;
 import com.example.education_platform.quiz.repository.ChoiceRepository;
 import com.example.education_platform.quiz.repository.QuizAttemptRepository;
@@ -34,6 +35,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
@@ -54,6 +56,7 @@ public class AttemptServiceImpl implements AttemptService {
     private final ChoiceRepository choices;
     private final AttemptMapper attemptMapper;
     private final CurrentUser currentUser;
+    private final ApplicationEventPublisher events;
 
     @Override
     @Transactional(readOnly = true)
@@ -134,6 +137,8 @@ public class AttemptServiceImpl implements AttemptService {
         attempt.setSubmittedAt(Instant.now());
         attempt.setStatus(quiz.isFullyAutoGradable() ? AttemptStatus.GRADED : AttemptStatus.SUBMITTED);
         attempts.flush();
+        // The gradebook listens for this; this feature does not know it exists
+        events.publishEvent(new QuizAttemptGraded(attempt.getId()));
         return respond(attempt);
     }
 

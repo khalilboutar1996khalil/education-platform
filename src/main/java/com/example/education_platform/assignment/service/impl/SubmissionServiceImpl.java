@@ -6,6 +6,7 @@ import com.example.education_platform.assignment.dto.response.SubmissionResponse
 import com.example.education_platform.assignment.entity.Assignment;
 import com.example.education_platform.assignment.entity.Submission;
 import com.example.education_platform.assignment.entity.SubmissionStatus;
+import com.example.education_platform.assignment.event.SubmissionGraded;
 import com.example.education_platform.assignment.mapper.AssignmentMapper;
 import com.example.education_platform.assignment.repository.AssignmentRepository;
 import com.example.education_platform.assignment.repository.SubmissionRepository;
@@ -23,6 +24,7 @@ import java.time.Instant;
 import java.util.EnumSet;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
@@ -44,6 +46,7 @@ public class SubmissionServiceImpl implements SubmissionService {
     private final StorageService storage;
     private final AssignmentMapper assignmentMapper;
     private final CurrentUser currentUser;
+    private final ApplicationEventPublisher events;
 
     // ---------- the student's side ----------
 
@@ -150,6 +153,8 @@ public class SubmissionServiceImpl implements SubmissionService {
 
         submission.applyGrade(request.grade(), request.feedback(), currentUser.get(), Instant.now());
         submissions.flush();
+        // The gradebook listens for this; this feature does not know it exists
+        events.publishEvent(new SubmissionGraded(submission.getId()));
         return assignmentMapper.toSubmission(submission);
     }
 

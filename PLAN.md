@@ -148,9 +148,13 @@ behind the same `StorageService`; a deleted assignment leaves its uploaded bytes
 nothing cascades into `stored_files` and no sweeper exists yet.
 
 ### Step 6 — Notes (gradebook)
-- [ ] Grade aggregation from quizzes + assignments (+ manual grades, e.g. partiel)
-- [ ] Admin: gradebook per module; student: averages per module
-- [ ] Tests
+- [x] Grade aggregation from quizzes + assignments (+ manual grades, e.g. partiel)
+- [x] Admin: gradebook per module; student: averages per module
+- [x] Tests
+
+Known wart: a pair partner's copy of a TP mark is written as a MANUAL grade, because the partial
+unique index allows only one grade per source row. It is correct but mislabelled, and a
+`shared_with_id` column on `grades` would say what actually happened.
 
 ### Step 7 — Ressources
 - [ ] Entity `Resource` (PDF / VIDEO / ZIP, module or all modules) + migration
