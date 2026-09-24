@@ -20,6 +20,16 @@ public interface UserRepository extends JpaRepository<User, Long> {
     /** Denominator of a module's class average. */
     long countByRoleAndLevelAndStatus(Role role, Level level, UserStatus status);
 
+    /** Audience of an announcement; a null level counts every level rather than none. */
+    @Query("""
+            select count(u) from User u
+            where u.role = :role and u.status = :status
+              and (:level is null or u.level = :level)
+            """)
+    long countStudents(@Param("role") Role role,
+                       @Param("status") UserStatus status,
+                       @Param("level") Level level);
+
     /** Every filter is optional; a null one drops out of the predicate rather than matching nothing. */
     @Query("""
             select u from User u

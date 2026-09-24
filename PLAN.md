@@ -162,9 +162,12 @@ unique index allows only one grade per source row. It is correct but mislabelled
 - [x] Tests
 
 ### Step 8 — Annonces & Blog
-- [ ] `Announcement` (section-wide or per module, recipients count)
-- [ ] `BlogPost` (category, draft/published, excerpt, read time, views)
-- [ ] Tests
+- [x] `Announcement` (section-wide or per module, recipients count)
+- [x] `BlogPost` (category, draft/published, excerpt, read time, views)
+- [x] Tests
+
+Carried into Step 9: publishing an announcement freezes its audience size but sends nothing —
+the fan-out into notifications and the email arrive with the notification work.
 
 ### Step 9 — Dashboard, notifications & background jobs
 - [ ] Domain events (submission created, quiz finished, …) → notifications + recent activity
