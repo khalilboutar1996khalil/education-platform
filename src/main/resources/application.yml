@@ -33,6 +33,11 @@ spring:
       max-file-size: 500MB      # matches app.storage.max-file-size
       max-request-size: 520MB   # one file plus its form fields
 
+logging:
+  pattern:
+    # [requestId] on every line: one request's story can be grepped out of the interleaving
+    console: "%d{HH:mm:ss.SSS} %-5level [%X{requestId:-no-request}] %logger{32} - %msg%n"
+
 server:
   port: ${SERVER_PORT:8080}
 

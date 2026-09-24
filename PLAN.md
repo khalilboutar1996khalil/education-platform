@@ -182,10 +182,11 @@ forgot-password — part of feature 1 that Step 2 never built. Still missing fro
 **access requests** (the "demander un accès" form), which has no entity, endpoint or migration.
 
 ### Step 10 — Production readiness
-- [ ] Dockerfile
-- [ ] GitHub Actions CI: build, tests, Sonar analysis
-- [ ] Structured logging with request id
+- [x] Dockerfile
+- [x] GitHub Actions CI: build, tests, Sonar analysis
+- [x] Structured logging with request id
 - [ ] Final Sonar pass: no blocker/critical issues, coverage ≥ 70 %
+      (blocked on a SONAR_TOKEN repository secret; the CI job is written and skips until one exists)
 
 ---
 

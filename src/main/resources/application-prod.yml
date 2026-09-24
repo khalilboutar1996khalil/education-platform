@@ -13,5 +13,10 @@ springdoc:
     enabled: false
 
 logging:
+  # One JSON object per line, MDC included, so a log aggregator can index requestId as a field
+  # rather than a human having to read it. ECS is what Elastic and most hosted tools expect.
+  structured:
+    format:
+      console: ecs
   level:
     root: INFO
