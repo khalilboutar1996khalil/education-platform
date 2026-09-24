@@ -3,10 +3,14 @@ package com.example.education_platform.auth.service.impl;
 import com.example.education_platform.auth.dto.request.LoginRequest;
 import com.example.education_platform.auth.dto.response.LoginResponse;
 import com.example.education_platform.auth.dto.response.TokenResponse;
+import com.example.education_platform.auth.entity.PasswordResetToken;
 import com.example.education_platform.auth.entity.RefreshToken;
+import com.example.education_platform.auth.repository.PasswordResetTokenRepository;
 import com.example.education_platform.auth.repository.RefreshTokenRepository;
 import com.example.education_platform.auth.service.AuthService;
+import com.example.education_platform.common.exception.BusinessException;
 import com.example.education_platform.common.exception.InvalidRefreshTokenException;
+import com.example.education_platform.mail.service.EmailService;
 import com.example.education_platform.security.JwtProperties;
 import com.example.education_platform.security.LoginRateLimiter;
 import com.example.education_platform.security.TokenService;
@@ -34,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthServiceImpl implements AuthService {
 
     private static final SecureRandom RANDOM = new SecureRandom();
+    private static final java.time.Duration RESET_VALIDITY = java.time.Duration.ofHours(1);
 
     private final UserRepository users;
     private final RefreshTokenRepository refreshTokens;
@@ -42,6 +47,8 @@ public class AuthServiceImpl implements AuthService {
     private final JwtProperties jwtProperties;
     private final UserMapper userMapper;
     private final LoginRateLimiter rateLimiter;
+    private final PasswordResetTokenRepository resetTokens;
+    private final EmailService emailService;
 
     @Override
     @Transactional
@@ -82,6 +89,33 @@ public class AuthServiceImpl implements AuthService {
         // Logging out with an unknown token is not an error — the session is gone either way
         refreshTokens.findByTokenHash(hash(refreshToken))
                 .ifPresent(token -> token.revoke(Instant.now()));
+    }
+
+    @Override
+    @Transactional
+    public void requestPasswordReset(String email) {
+        // Silent when the address is unknown: a different answer would leak who has an account
+        users.findByEmail(normalise(email)).ifPresent(user -> {
+            String raw = randomToken();
+            resetTokens.save(new PasswordResetToken(user, hash(raw),
+                    Instant.now().plus(RESET_VALIDITY)));
+            emailService.sendPasswordReset(user.getEmail(), user.getFullName(), raw);
+        });
+    }
+
+    @Override
+    @Transactional
+    public void resetPassword(String token, String newPassword) {
+        Instant now = Instant.now();
+        PasswordResetToken stored = resetTokens.findByTokenHash(hash(token))
+                .filter(candidate -> candidate.isUsable(now))
+                .orElseThrow(() -> new BusinessException("This reset link is no longer valid"));
+
+        stored.consume(now);
+        User user = stored.getUser();
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        // Whoever was signed in with the old password is signed out by it changing
+        refreshTokens.revokeAllForUser(user.getId(), now);
     }
 
     private TokenResponse issueTokens(User user, String userAgent, String ipAddress) {

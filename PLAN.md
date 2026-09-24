@@ -170,12 +170,16 @@ Carried into Step 9: publishing an announcement freezes its audience size but se
 the fan-out into notifications and the email arrive with the notification work.
 
 ### Step 9 — Dashboard, notifications & background jobs
-- [ ] Domain events (submission created, quiz finished, …) → notifications + recent activity
-- [ ] `Notification` entity, list / mark as read
-- [ ] Dashboard endpoints (admin + student stats, weekly chart, deadlines, activity) with caching
-- [ ] `@Scheduled` jobs: auto-close quizzes/TPs after deadline, deadline reminders
-- [ ] Email service (invitations, password reset)
-- [ ] Tests
+- [x] Domain events (submission created, quiz finished, …) → notifications + recent activity
+- [x] `Notification` entity, list / mark as read
+- [x] Dashboard endpoints (admin + student stats, weekly chart, deadlines, activity) with caching
+- [x] `@Scheduled` jobs: auto-close quizzes/TPs after deadline, deadline reminders
+- [x] Email service (invitations, password reset)
+- [x] Tests
+
+Also closed here: expired quiz attempts and orphaned files, both deferred from Steps 4 and 5, and
+forgot-password — part of feature 1 that Step 2 never built. Still missing from feature 1:
+**access requests** (the "demander un accès" form), which has no entity, endpoint or migration.
 
 ### Step 10 — Production readiness
 - [ ] Dockerfile

@@ -4,6 +4,7 @@ import com.example.education_platform.auth.repository.RefreshTokenRepository;
 import com.example.education_platform.common.PageResponse;
 import com.example.education_platform.common.exception.ConflictException;
 import com.example.education_platform.common.exception.ResourceNotFoundException;
+import com.example.education_platform.mail.service.EmailService;
 import com.example.education_platform.security.AccessGuard;
 import com.example.education_platform.security.CurrentUser;
 import com.example.education_platform.user.dto.request.ChangePasswordRequest;
@@ -43,6 +44,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final CurrentUser currentUser;
     private final AccessGuard accessGuard;
+    private final EmailService emailService;
 
     @Override
     @Transactional
@@ -56,7 +58,10 @@ public class UserServiceImpl implements UserService {
         User student = new User(request.fullName().trim(), email,
                 passwordEncoder.encode(temporaryPassword), Role.STUDENT, request.level());
 
-        return new InviteStudentResponse(userMapper.toResponse(users.save(student)), temporaryPassword);
+        User saved = users.save(student);
+        // Still returned as well: without SMTP configured the mail goes nowhere
+        emailService.sendInvitation(saved.getEmail(), saved.getFullName(), temporaryPassword);
+        return new InviteStudentResponse(userMapper.toResponse(saved), temporaryPassword);
     }
 
     @Override

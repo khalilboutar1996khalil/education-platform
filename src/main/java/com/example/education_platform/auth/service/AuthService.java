@@ -11,4 +11,13 @@ public interface AuthService {
     TokenResponse refresh(String refreshToken, String userAgent, String ipAddress);
 
     void logout(String refreshToken);
+
+    /**
+     * Always succeeds, whether or not the address exists: answering differently would turn this
+     * endpoint into a way of discovering who has an account.
+     */
+    void requestPasswordReset(String email);
+
+    /** Consumes the token, sets the password and ends every session opened with the old one. */
+    void resetPassword(String token, String newPassword);
 }

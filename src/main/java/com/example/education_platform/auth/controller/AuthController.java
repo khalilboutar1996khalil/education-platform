@@ -1,7 +1,9 @@
 package com.example.education_platform.auth.controller;
 
+import com.example.education_platform.auth.dto.request.ForgotPasswordRequest;
 import com.example.education_platform.auth.dto.request.LoginRequest;
 import com.example.education_platform.auth.dto.request.RefreshRequest;
+import com.example.education_platform.auth.dto.request.ResetPasswordRequest;
 import com.example.education_platform.auth.dto.response.LoginResponse;
 import com.example.education_platform.auth.dto.response.TokenResponse;
 import com.example.education_platform.auth.service.AuthService;
@@ -37,6 +39,20 @@ public class AuthController {
     @Operation(summary = "Exchange a refresh token for a new pair; the presented token is revoked")
     TokenResponse refresh(@Valid @RequestBody RefreshRequest request, HttpServletRequest http) {
         return authService.refresh(request.refreshToken(), http.getHeader("User-Agent"), http.getRemoteAddr());
+    }
+
+    @PostMapping("/forgot-password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Ask for a reset link; answers the same whether or not the address exists")
+    void forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        authService.requestPasswordReset(request.email());
+    }
+
+    @PostMapping("/reset-password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Set a new password from a reset link; this signs out every session")
+    void resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        authService.resetPassword(request.token(), request.newPassword());
     }
 
     @PostMapping("/logout")
