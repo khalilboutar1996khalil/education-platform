@@ -196,6 +196,12 @@ public class GradebookServiceImpl implements GradebookService {
                 grades.findByCourseIdAndStudentIdOrderByCreatedAtAsc(courseId, me.getId()));
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public BigDecimal overallAverage(Long studentId) {
+        return weightedAverage(grades.findByStudentIdOrderByCourseIdAscCreatedAtAsc(studentId));
+    }
+
     // ---------- averaging ----------
 
     /**

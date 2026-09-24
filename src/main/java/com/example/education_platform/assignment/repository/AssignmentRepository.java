@@ -3,7 +3,9 @@ package com.example.education_platform.assignment.repository;
 import com.example.education_platform.assignment.entity.Assignment;
 import com.example.education_platform.assignment.entity.AssignmentStatus;
 import com.example.education_platform.user.entity.Level;
+import java.time.Instant;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,4 +34,19 @@ public interface AssignmentRepository extends JpaRepository<Assignment, Long> {
                                  @Param("courseId") Long courseId,
                                  @Param("statuses") Collection<AssignmentStatus> statuses,
                                  Pageable pageable);
+
+    /** What is coming up. Course is mandatory here, so the implicit join is correctly an inner one. */
+    @EntityGraph(attributePaths = "course")
+    @Query("""
+            select a from Assignment a
+            where a.status = :status and a.deadline is not null and a.deadline > :now
+              and (:level is null or a.course.level = :level)
+            order by a.deadline
+            """)
+    List<Assignment> findUpcoming(@Param("status") AssignmentStatus status,
+                                  @Param("level") Level level,
+                                  @Param("now") Instant now,
+                                  Pageable pageable);
+
+    long countByStatus(AssignmentStatus status);
 }

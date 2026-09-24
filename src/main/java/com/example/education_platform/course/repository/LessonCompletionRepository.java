@@ -11,6 +11,8 @@ public interface LessonCompletionRepository extends JpaRepository<LessonCompleti
 
     boolean existsByStudentIdAndLessonId(Long studentId, Long lessonId);
 
+    long countByStudentId(Long studentId);
+
     long deleteByStudentIdAndLessonId(Long studentId, Long lessonId);
 
     @Query("""

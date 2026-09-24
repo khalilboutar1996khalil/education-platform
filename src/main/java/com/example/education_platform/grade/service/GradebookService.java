@@ -29,4 +29,7 @@ public interface GradebookService {
     List<CourseAverageResponse> myAverages();
 
     List<GradeResponse> myGrades(Long courseId);
+
+    /** One number across every module, for the dashboard. Null when nothing has been marked. */
+    java.math.BigDecimal overallAverage(Long studentId);
 }

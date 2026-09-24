@@ -40,6 +40,10 @@ dependencies {
     implementation 'org.flywaydb:flyway-database-postgresql'
     runtimeOnly 'org.postgresql:postgresql'
 
+    // Dashboard caching: Caffeine gives the TTL that the plain in-memory manager lacks
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'com.github.ben-manes.caffeine:caffeine'
+
     // Monitoring (health checks, info)
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
