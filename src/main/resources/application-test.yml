@@ -7,6 +7,9 @@ spring:
     password: ${TEST_DB_PASSWORD:eduflow}
 
 app:
+  storage:
+    # A throwaway directory, so tests never write into the dev uploads
+    location: ${java.io.tmpdir}/eduflow-test-uploads
   security:
     login:
       # Effectively disabled: the dedicated rate-limit test lowers it with @TestPropertySource.

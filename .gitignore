@@ -40,3 +40,6 @@ out/
 .env
 .draft/
 .DS_Store
+
+# Uploaded files (dev): never committed
+var/

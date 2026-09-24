@@ -28,6 +28,11 @@ spring:
   messages:
     fallback-to-system-locale: false   # always serve messages.properties (French), never the JVM's locale
 
+  servlet:
+    multipart:
+      max-file-size: 500MB      # matches app.storage.max-file-size
+      max-request-size: 520MB   # one file plus its form fields
+
 server:
   port: ${SERVER_PORT:8080}
 
@@ -62,5 +67,18 @@ app:
     login:
       max-failures: 5     # consecutive failures tolerated per email address
       lockout: 15m
+  storage:
+    location: ${STORAGE_LOCATION:./var/uploads}
+    max-file-size: 500MB
+    # An allow-list, never a deny-list: anything unlisted is refused
+    allowed-content-types:
+      - application/pdf
+      - application/zip
+      - application/x-zip-compressed
+      - image/png
+      - image/jpeg
+      - text/plain
+      - application/msword
+      - application/vnd.openxmlformats-officedocument.wordprocessingml.document
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
