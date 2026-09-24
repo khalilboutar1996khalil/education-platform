@@ -3,6 +3,7 @@ package com.example.education_platform.announcement.service.impl;
 import com.example.education_platform.announcement.dto.request.AnnouncementRequest;
 import com.example.education_platform.announcement.dto.response.AnnouncementResponse;
 import com.example.education_platform.announcement.entity.Announcement;
+import com.example.education_platform.announcement.event.AnnouncementPublished;
 import com.example.education_platform.announcement.mapper.AnnouncementMapper;
 import com.example.education_platform.announcement.repository.AnnouncementRepository;
 import com.example.education_platform.announcement.service.AnnouncementService;
@@ -19,6 +20,7 @@ import com.example.education_platform.user.repository.UserRepository;
 import java.time.Instant;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
@@ -35,6 +37,7 @@ public class AnnouncementServiceImpl implements AnnouncementService {
     private final UserRepository users;
     private final AnnouncementMapper announcementMapper;
     private final CurrentUser currentUser;
+    private final ApplicationEventPublisher events;
 
     @Override
     @Transactional(readOnly = true)
@@ -91,6 +94,9 @@ public class AnnouncementServiceImpl implements AnnouncementService {
         }
         long recipients = users.countStudents(Role.STUDENT, UserStatus.ACTIVE, announcement.targetLevel());
         announcement.publish(Instant.now(), Math.toIntExact(recipients));
+        announcements.flush();
+        // Notifications listen for this; this feature does not know they exist
+        events.publishEvent(new AnnouncementPublished(announcement.getId()));
         return announcementMapper.toResponse(announcement);
     }
 

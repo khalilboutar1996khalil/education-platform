@@ -4,6 +4,7 @@ import com.example.education_platform.user.entity.Level;
 import com.example.education_platform.user.entity.Role;
 import com.example.education_platform.user.entity.User;
 import com.example.education_platform.user.entity.UserStatus;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +30,16 @@ public interface UserRepository extends JpaRepository<User, Long> {
     long countStudents(@Param("role") Role role,
                        @Param("status") UserStatus status,
                        @Param("level") Level level);
+
+    /** The same audience, loaded: who an announcement actually goes out to. */
+    @Query("""
+            select u from User u
+            where u.role = :role and u.status = :status
+              and (:level is null or u.level = :level)
+            """)
+    List<User> findActiveStudents(@Param("role") Role role,
+                                  @Param("status") UserStatus status,
+                                  @Param("level") Level level);
 
     /** Every filter is optional; a null one drops out of the predicate rather than matching nothing. */
     @Query("""
