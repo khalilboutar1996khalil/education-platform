@@ -178,8 +178,8 @@ the fan-out into notifications and the email arrive with the notification work.
 - [x] Tests
 
 Also closed here: expired quiz attempts and orphaned files, both deferred from Steps 4 and 5, and
-forgot-password — part of feature 1 that Step 2 never built. Still missing from feature 1:
-**access requests** (the "demander un accès" form), which has no entity, endpoint or migration.
+forgot-password — part of feature 1 that Step 2 never built. Access requests, the last piece of
+feature 1, landed after Step 10 as `V14__create_access_requests.sql`: features 1–16 are complete.
 
 ### Step 10 — Production readiness
 - [x] Dockerfile

@@ -48,6 +48,11 @@ public class SecurityConfig {
         "/error"
     };
 
+    /** Asking for access is by definition something a person without an account has to do. */
+    private static final String[] PUBLIC_POST = {
+        "/api/v1/access-requests"
+    };
+
     private static final String[] PUBLIC_AUTH_POST = {
         "/api/v1/auth/login",
         "/api/v1/auth/refresh",
@@ -65,6 +70,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_GET).permitAll()
                         .requestMatchers(HttpMethod.POST, PUBLIC_AUTH_POST).permitAll()
+                        .requestMatchers(HttpMethod.POST, PUBLIC_POST).permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth -> oauth
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
