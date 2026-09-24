@@ -19,6 +19,8 @@ public interface SubmissionRepository extends JpaRepository<Submission, Long> {
     /** The owner's row. A partner's own view comes from {@link #findMine}, not from here. */
     Optional<Submission> findByAssignmentIdAndStudentId(Long assignmentId, Long studentId);
 
+    boolean existsByAssignmentId(Long assignmentId);
+
     /** Either side of a pair counts, which is why this cannot be a derived query on one column. */
     @Query("""
             select s from Submission s

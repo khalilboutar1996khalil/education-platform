@@ -136,12 +136,16 @@ markable by hand; and `lessons.quiz_id` is still unwired, so a QUIZ lesson does 
 quiz until a screen needs it.
 
 ### Step 5 — TP & devoirs, submissions, corrections, file storage
-- [ ] `StorageService` interface + local-disk implementation, file validation (type, size, name)
-- [ ] Entities `Assignment` (TP / DEVOIR, pair / individual), `Submission` + migration
-- [ ] Admin: create assignment, list submissions to grade, grade + feedback
-- [ ] Student: upload submission (draft / submitted), see grade
-- [ ] Ownership checks (student sees only own submissions)
-- [ ] Tests
+- [x] `StorageService` interface + local-disk implementation, file validation (type, size, name)
+- [x] Entities `Assignment` (TP / DEVOIR, pair / individual), `Submission` + migration
+- [x] Admin: create assignment, list submissions to grade, grade + feedback
+- [x] Student: upload submission (draft / submitted), see grade
+- [x] Ownership checks (student sees only own submissions)
+- [x] Tests
+
+Carried into later steps: files live on local disk, so a second instance needs an object store
+behind the same `StorageService`; a deleted assignment leaves its uploaded bytes on disk, since
+nothing cascades into `stored_files` and no sweeper exists yet.
 
 ### Step 6 — Notes (gradebook)
 - [ ] Grade aggregation from quizzes + assignments (+ manual grades, e.g. partiel)
