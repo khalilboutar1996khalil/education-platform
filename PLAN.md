@@ -18,7 +18,7 @@ We build **one step at a time**: each step is reviewed and tested in Swagger bef
 | API docs | springdoc-openapi (Swagger UI) |
 | Validation | Jakarta Validation |
 | Tests | JUnit 5, Mockito, Spring Boot Test (MockMvc) |
-| Quality | SonarQube, JaCoCo (coverage), Checkstyle |
+| Quality | JaCoCo (coverage gate), Checkstyle, the test suite |
 | Ops | Spring Boot Actuator, structured logging |
 
 ---
@@ -185,8 +185,13 @@ feature 1, landed after Step 10 as `V14__create_access_requests.sql`: features 1
 - [x] Dockerfile
 - [x] GitHub Actions CI: build, tests, Sonar analysis
 - [x] Structured logging with request id
-- [ ] Final Sonar pass: no blocker/critical issues, coverage ≥ 70 %
-      (blocked on a SONAR_TOKEN repository secret; the CI job is written and skips until one exists)
+- [x] Quality gate in CI: Checkstyle at zero warnings, JaCoCo at ≥ 70 %, full test suite
+
+Sonar was dropped rather than done. SonarCloud is free only for public repositories and this one is
+private; self-hosting SonarQube Community would mean a server to run and patch for a school project.
+SpotBugs was tried as a free stand-in and removed too: it cannot read Java 26 class files, so it
+broke the build on the development machine. The quality gate is therefore Checkstyle (maxWarnings=0),
+the JaCoCo 70 % floor and 291 tests, all enforced on every push by CI.
 
 ---
 

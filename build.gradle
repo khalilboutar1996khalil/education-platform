@@ -4,7 +4,6 @@ plugins {
     id 'checkstyle'             // code style checks
     id 'org.springframework.boot' version '4.1.1'
     id 'io.spring.dependency-management' version '1.1.7'
-    id 'org.sonarqube' version '7.5.0.8588'
 }
 
 group = 'com.example'
@@ -108,7 +107,7 @@ jacoco {
 jacocoTestReport {
     dependsOn test
     reports {
-        xml.required = true   // read by SonarQube
+        xml.required = true   // machine-readable, for CI
         html.required = true  // for humans: build/reports/jacoco/test/html/index.html
     }
     classDirectories.setFrom(files(classDirectories.files.collect {
@@ -141,16 +140,3 @@ checkstyle {
     maxWarnings = 0
 }
 
-// ---------- SonarQube ----------
-// Run with: ./gradlew test sonar   (needs SONAR_TOKEN, and SONAR_HOST_URL unless it is localhost:9000)
-
-sonar {
-    properties {
-        property 'sonar.projectKey', 'eduflow-backend'
-        property 'sonar.projectName', 'EduFlow Backend'
-        property 'sonar.host.url', System.getenv('SONAR_HOST_URL') ?: 'http://localhost:9000'
-        property 'sonar.coverage.jacoco.xmlReportPaths',
-                layout.buildDirectory.file('reports/jacoco/test/jacocoTestReport.xml').get().asFile.path
-        property 'sonar.coverage.exclusions', coverageExclusions.join(',')
-    }
-}
