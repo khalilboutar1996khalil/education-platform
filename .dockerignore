@@ -1,0 +1,22 @@
+# Keep the build context small, and keep things out of the image that must never be in one.
+
+# Secrets and uploaded files above all else
+.env
+var/
+
+# Build output: the image builds its own
+build/
+.gradle/
+
+# Version control and tooling
+.git/
+.github/
+.idea/
+.draft/
+*.iml
+
+# Docs and local notes
+*.md
+!README.md
+
+.DS_Store

@@ -1,0 +1,48 @@
+# The whole stack: Postgres plus the API.
+#
+#   docker compose up --build
+#
+# Bring only the database up for local development against a host-run app:
+#
+#   docker compose up postgres
+
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: eduflow
+      POSTGRES_USER: eduflow
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-eduflow}
+    ports:
+      - "5432:5432"
+    volumes:
+      - eduflow-data:/var/lib/postgresql/data
+    healthcheck:
+      # The API waits for this rather than for the port, which opens before Postgres is ready
+      test: ["CMD-SHELL", "pg_isready -U eduflow -d eduflow"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:postgresql://postgres:5432/eduflow
+      DB_USERNAME: eduflow
+      DB_PASSWORD: ${DB_PASSWORD:-eduflow}
+      # No default on purpose: production must fail to start rather than sign with a known key
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET, e.g. openssl rand -base64 32}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173}
+    ports:
+      - "8080:8080"
+    volumes:
+      # Uploads outlive the container; without this they go when it does
+      - eduflow-uploads:/app/var/uploads
+
+volumes:
+  eduflow-data:
+  eduflow-uploads:
