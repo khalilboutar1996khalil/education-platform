@@ -101,30 +101,39 @@ Legend: `[ ]` todo · `[x]` done
 - **Done when:** Swagger UI opens at `/swagger-ui.html` and errors return the standard format. ✅
 
 ### Step 2 — Auth, users & profile
-- [ ] `User` entity (role ADMIN/STUDENT, level 2AS/3AS, status) + Flyway migration
-- [ ] Login → access + refresh token; refresh; logout
-- [ ] Rate limiting on login
-- [ ] Admin: invite student, list/filter students (paginated), change status
-- [ ] Me: get/update profile, change password, preferences
-- [ ] Ownership checks helper (student sees only own data)
-- [ ] Unit + integration tests
-- **Done when:** admin and student can log in from Swagger and see only what they are allowed to.
+- [x] `User` entity (role ADMIN/STUDENT, level 2AS/3AS, status) + Flyway migration
+- [x] Login → access + refresh token; refresh; logout
+- [x] Rate limiting on login
+- [x] Admin: invite student, list/filter students (paginated), change status
+- [x] Me: get/update profile, change password, preferences
+- [x] Ownership checks helper (student sees only own data)
+- [x] Unit + integration tests
+- **Done when:** admin and student can log in from Swagger and see only what they are allowed to. ✅
+
+Carried into later steps: the invitation returns a one-time temporary password instead of
+sending mail (Step 9 adds the email service), and login rate limiting is in-memory, so it
+resets on restart and is not shared between instances.
 
 ### Step 3 — Modules, chapters, lessons & progress
-- [ ] Entities `Course`, `Chapter`, `Lesson`, `LessonCompletion` + migration
-- [ ] CRUD modules / chapters / lessons (admin), ordering by position
-- [ ] Students see only their level; mark lesson done / undone
-- [ ] Progress % per student and class average per module
-- [ ] Demo seed data (dev profile) from the design
-- [ ] Tests
-- **Done when:** the Modules and module-detail screens can be fully fed by the API.
+- [x] Entities `Course`, `Chapter`, `Lesson`, `LessonCompletion` + migration
+- [x] CRUD modules / chapters / lessons (admin), ordering by position
+- [x] Students see only their level; mark lesson done / undone
+- [x] Progress % per student and class average per module
+- [x] Demo seed data (dev profile) from the design
+- [x] Tests
+- **Done when:** the Modules and module-detail screens can be fully fed by the API. ✅
 
 ### Step 4 — Quiz
-- [ ] Entities `Quiz`, `Question`, `Choice`, `QuizAttempt`, `Answer` + migration
-- [ ] Admin: create/edit quiz, statuses (DRAFT / IN_PROGRESS / CLOSED), deadline, duration
-- [ ] Student: start attempt, submit answers, automatic scoring
-- [ ] Stats: submissions, average score
-- [ ] Tests
+- [x] Entities `Quiz`, `Question`, `Choice`, `QuizAttempt`, `Answer` + migration
+- [x] Admin: create/edit quiz, statuses (DRAFT / IN_PROGRESS / CLOSED), deadline, duration
+- [x] Student: start attempt, submit answers, automatic scoring
+- [x] Stats: submissions, average score
+- [x] Tests
+
+Carried into later steps: an expired attempt is written off the next time it is touched, since
+the `@Scheduled` auto-close job only arrives in Step 9; open questions are stored but not yet
+markable by hand; and `lessons.quiz_id` is still unwired, so a QUIZ lesson does not link to its
+quiz until a screen needs it.
 
 ### Step 5 — TP & devoirs, submissions, corrections, file storage
 - [ ] `StorageService` interface + local-disk implementation, file validation (type, size, name)
