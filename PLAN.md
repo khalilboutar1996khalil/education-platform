@@ -157,9 +157,9 @@ unique index allows only one grade per source row. It is correct but mislabelled
 `shared_with_id` column on `grades` would say what actually happened.
 
 ### Step 7 — Ressources
-- [ ] Entity `Resource` (PDF / VIDEO / ZIP, module or all modules) + migration
-- [ ] Upload, list/filter (paginated), download
-- [ ] Tests
+- [x] Entity `Resource` (PDF / VIDEO / ZIP / LINK, module or all modules) + migration
+- [x] Upload, list/filter (paginated), download
+- [x] Tests
 
 ### Step 8 — Annonces & Blog
 - [ ] `Announcement` (section-wide or per module, recipients count)

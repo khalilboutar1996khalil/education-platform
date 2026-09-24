@@ -5,7 +5,7 @@ import com.example.education_platform.assignment.dto.response.AssignmentDetailRe
 import com.example.education_platform.assignment.dto.response.AssignmentSummaryResponse;
 import com.example.education_platform.assignment.entity.AssignmentStatus;
 import com.example.education_platform.common.PageResponse;
-import org.springframework.core.io.Resource;
+import com.example.education_platform.storage.service.DownloadableFile;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,7 +28,4 @@ public interface AssignmentService {
 
     /** The subject sheet, readable by an admin or by a student of the right level. */
     DownloadableFile downloadBrief(Long id);
-
-    record DownloadableFile(Resource resource, String filename, String contentType, long sizeBytes) {
-    }
 }

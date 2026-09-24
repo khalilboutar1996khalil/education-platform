@@ -3,7 +3,7 @@ package com.example.education_platform.assignment.service;
 import com.example.education_platform.assignment.dto.request.GradeRequest;
 import com.example.education_platform.assignment.dto.request.SubmissionDraftRequest;
 import com.example.education_platform.assignment.dto.response.SubmissionResponse;
-import com.example.education_platform.assignment.service.AssignmentService.DownloadableFile;
+import com.example.education_platform.storage.service.DownloadableFile;
 import com.example.education_platform.common.PageResponse;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;

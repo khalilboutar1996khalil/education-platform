@@ -10,7 +10,7 @@ import com.example.education_platform.assignment.event.SubmissionGraded;
 import com.example.education_platform.assignment.mapper.AssignmentMapper;
 import com.example.education_platform.assignment.repository.AssignmentRepository;
 import com.example.education_platform.assignment.repository.SubmissionRepository;
-import com.example.education_platform.assignment.service.AssignmentService.DownloadableFile;
+import com.example.education_platform.storage.service.DownloadableFile;
 import com.example.education_platform.assignment.service.SubmissionService;
 import com.example.education_platform.common.PageResponse;
 import com.example.education_platform.common.exception.BusinessException;

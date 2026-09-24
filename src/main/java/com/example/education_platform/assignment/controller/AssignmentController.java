@@ -5,7 +5,7 @@ import com.example.education_platform.assignment.dto.request.AssignmentStatusReq
 import com.example.education_platform.assignment.dto.response.AssignmentDetailResponse;
 import com.example.education_platform.assignment.dto.response.AssignmentSummaryResponse;
 import com.example.education_platform.assignment.service.AssignmentService;
-import com.example.education_platform.assignment.service.AssignmentService.DownloadableFile;
+import com.example.education_platform.storage.service.DownloadableFile;
 import com.example.education_platform.common.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

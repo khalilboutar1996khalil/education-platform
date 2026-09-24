@@ -17,6 +17,7 @@ import com.example.education_platform.course.entity.Course;
 import com.example.education_platform.course.repository.CourseRepository;
 import com.example.education_platform.security.CurrentUser;
 import com.example.education_platform.storage.entity.StoredFile;
+import com.example.education_platform.storage.service.DownloadableFile;
 import com.example.education_platform.storage.service.StorageService;
 import com.example.education_platform.user.entity.Level;
 import com.example.education_platform.user.entity.User;
