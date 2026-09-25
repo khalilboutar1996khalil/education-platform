@@ -55,6 +55,8 @@ public class SecurityConfig {
 
     private static final String[] PUBLIC_AUTH_POST = {
         "/api/v1/auth/login",
+        // Self-registration: gated by a class code rather than by having an account already
+        "/api/v1/auth/register",
         "/api/v1/auth/refresh",
         "/api/v1/auth/logout",
         "/api/v1/auth/forgot-password",

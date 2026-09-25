@@ -1,12 +1,19 @@
 package com.example.education_platform.auth.service;
 
 import com.example.education_platform.auth.dto.request.LoginRequest;
+import com.example.education_platform.auth.dto.request.RegisterRequest;
 import com.example.education_platform.auth.dto.response.LoginResponse;
 import com.example.education_platform.auth.dto.response.TokenResponse;
 
 public interface AuthService {
 
     LoginResponse login(LoginRequest request, String userAgent, String ipAddress);
+
+    /**
+     * Creates an active student account from a valid class code and signs them in straight away:
+     * there is no approval step and no email, so the tokens come back with this same call.
+     */
+    LoginResponse register(RegisterRequest request, String userAgent, String ipAddress);
 
     TokenResponse refresh(String refreshToken, String userAgent, String ipAddress);
 

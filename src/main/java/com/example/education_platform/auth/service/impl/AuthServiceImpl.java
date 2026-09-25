@@ -1,6 +1,7 @@
 package com.example.education_platform.auth.service.impl;
 
 import com.example.education_platform.auth.dto.request.LoginRequest;
+import com.example.education_platform.auth.dto.request.RegisterRequest;
 import com.example.education_platform.auth.dto.response.LoginResponse;
 import com.example.education_platform.auth.dto.response.TokenResponse;
 import com.example.education_platform.auth.entity.PasswordResetToken;
@@ -8,12 +9,16 @@ import com.example.education_platform.auth.entity.RefreshToken;
 import com.example.education_platform.auth.repository.PasswordResetTokenRepository;
 import com.example.education_platform.auth.repository.RefreshTokenRepository;
 import com.example.education_platform.auth.service.AuthService;
+import com.example.education_platform.classcode.entity.ClassCode;
+import com.example.education_platform.classcode.repository.ClassCodeRepository;
 import com.example.education_platform.common.exception.BusinessException;
+import com.example.education_platform.common.exception.ConflictException;
 import com.example.education_platform.common.exception.InvalidRefreshTokenException;
 import com.example.education_platform.mail.service.EmailService;
 import com.example.education_platform.security.JwtProperties;
 import com.example.education_platform.security.LoginRateLimiter;
 import com.example.education_platform.security.TokenService;
+import com.example.education_platform.user.entity.Role;
 import com.example.education_platform.user.entity.User;
 import com.example.education_platform.user.entity.UserStatus;
 import com.example.education_platform.user.mapper.UserMapper;
@@ -49,6 +54,7 @@ public class AuthServiceImpl implements AuthService {
     private final LoginRateLimiter rateLimiter;
     private final PasswordResetTokenRepository resetTokens;
     private final EmailService emailService;
+    private final ClassCodeRepository classCodes;
 
     @Override
     @Transactional
@@ -67,6 +73,27 @@ public class AuthServiceImpl implements AuthService {
 
         User user = found.get();
         rateLimiter.recordSuccess(email);
+        return new LoginResponse(issueTokens(user, userAgent, ipAddress), userMapper.toResponse(user));
+    }
+
+    @Override
+    @Transactional
+    public LoginResponse register(RegisterRequest request, String userAgent, String ipAddress) {
+        ClassCode classCode = classCodes
+                .findByCodeIgnoreCaseAndActiveTrue(ClassCode.normalise(request.classCode()))
+                .orElseThrow(() -> new BusinessException("Code de classe invalide ou expiré"));
+
+        String email = normalise(request.email());
+        if (users.existsByEmail(email)) {
+            // Said plainly on purpose: whoever is registering already knows this address is theirs,
+            // and the alternative is a silent failure they cannot act on.
+            throw new ConflictException("Un compte existe déjà pour cette adresse email");
+        }
+
+        // The level comes from the code, never from the request, so a 2ᵉ AS code cannot open 3ᵉ AS.
+        User user = users.save(new User(request.fullName().trim(), email,
+                passwordEncoder.encode(request.password()), Role.STUDENT, classCode.getLevel()));
+
         return new LoginResponse(issueTokens(user, userAgent, ipAddress), userMapper.toResponse(user));
     }
 

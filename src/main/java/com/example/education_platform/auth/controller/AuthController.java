@@ -3,6 +3,7 @@ package com.example.education_platform.auth.controller;
 import com.example.education_platform.auth.dto.request.ForgotPasswordRequest;
 import com.example.education_platform.auth.dto.request.LoginRequest;
 import com.example.education_platform.auth.dto.request.RefreshRequest;
+import com.example.education_platform.auth.dto.request.RegisterRequest;
 import com.example.education_platform.auth.dto.request.ResetPasswordRequest;
 import com.example.education_platform.auth.dto.response.LoginResponse;
 import com.example.education_platform.auth.dto.response.TokenResponse;
@@ -23,8 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
-@Tag(name = "Auth", description = "Login, token refresh and logout")
-@SecurityRequirements // these three endpoints take no Bearer token, so Swagger shouldn't ask for one
+@Tag(name = "Auth", description = "Registration, login, token refresh and logout")
+@SecurityRequirements // none of these endpoints take a Bearer token, so Swagger shouldn't ask for one
 public class AuthController {
 
     private final AuthService authService;
@@ -33,6 +34,13 @@ public class AuthController {
     @Operation(summary = "Exchange email and password for an access token and a refresh token")
     LoginResponse login(@Valid @RequestBody LoginRequest request, HttpServletRequest http) {
         return authService.login(request, http.getHeader("User-Agent"), http.getRemoteAddr());
+    }
+
+    @PostMapping("/register")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Create a student account from a class code and sign in, in one call")
+    LoginResponse register(@Valid @RequestBody RegisterRequest request, HttpServletRequest http) {
+        return authService.register(request, http.getHeader("User-Agent"), http.getRemoteAddr());
     }
 
     @PostMapping("/refresh")

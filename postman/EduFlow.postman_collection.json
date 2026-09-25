@@ -1,0 +1,3591 @@
+{
+  "info": {
+    "name": "EduFlow API",
+    "description": "EduFlow — backend for an Algerian lycée CS section.\n\n**Start here:** run `Auth > Login` first. It stores the access token in a collection variable, and every other request inherits it automatically.\n\nSeeded dev accounts (dev profile only):\n- admin/teacher — `prof@eduflow.dz`\n- student — `amira@eduflow.dz`\n\n98 endpoints, generated from the live OpenAPI spec.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refreshToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Annonces",
+      "item": [
+        {
+          "name": "List notices; pinned first, then newest. Drafts are admin-only",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/announcements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "announcements"
+              ],
+              "query": [
+                {
+                  "key": "courseId",
+                  "value": "1",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Zero-based page index (0..N)",
+                  "disabled": true
+                },
+                {
+                  "key": "size",
+                  "value": "1",
+                  "description": "The size of the page to be returned",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "['string']",
+                  "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "List notices; pinned first, then newest. Drafts are admin-only"
+          },
+          "response": []
+        },
+        {
+          "name": "Write a notice; it stays a draft until published",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/announcements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "announcements"
+              ]
+            },
+            "description": "Write a notice; it stays a draft until published",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"string\",\n  \"body\": \"string\",\n  \"courseId\": 1,\n  \"level\": \"SECOND_AS\",\n  \"pinned\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "One notice",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/announcements/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "announcements",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "One notice"
+          },
+          "response": []
+        },
+        {
+          "name": "Edit a draft; a published notice can no longer be changed",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/announcements/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "announcements",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Edit a draft; a published notice can no longer be changed",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"string\",\n  \"body\": \"string\",\n  \"courseId\": 1,\n  \"level\": \"SECOND_AS\",\n  \"pinned\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete a notice",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/announcements/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "announcements",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Delete a notice"
+          },
+          "response": []
+        },
+        {
+          "name": "Publish it and freeze how many students it reached",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/announcements/:id/publish",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "announcements",
+                ":id",
+                "publish"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Publish it and freeze how many students it reached"
+          },
+          "response": []
+        }
+      ],
+      "description": "6 endpoints"
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Ask for a reset link; answers the same whether or not the address exists",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/forgot-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "forgot-password"
+              ]
+            },
+            "description": "Ask for a reset link; answers the same whether or not the address exists",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Exchange email and password for an access token and a refresh token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Exchange email and password for an access token and a refresh token",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"string\",\n  \"password\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Stores the tokens so every other request in this collection just works.",
+                  "const body = pm.response.json();",
+                  "if (body.tokens) {",
+                  "    pm.collectionVariables.set('accessToken', body.tokens.accessToken);",
+                  "    pm.collectionVariables.set('refreshToken', body.tokens.refreshToken);",
+                  "    console.log('Token stored for ' + (body.user && body.user.email));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Revoke a refresh token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "logout"
+              ]
+            },
+            "description": "Revoke a refresh token",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Exchange a refresh token for a new pair; the presented token is revoked",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/refresh",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "refresh"
+              ]
+            },
+            "description": "Exchange a refresh token for a new pair; the presented token is revoked",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Set a new password from a reset link; this signs out every session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/reset-password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "reset-password"
+              ]
+            },
+            "description": "Set a new password from a reset link; this signs out every session",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"string\",\n  \"newPassword\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "5 endpoints"
+    },
+    {
+      "name": "Blog",
+      "item": [
+        {
+          "name": "List categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/blog/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "blog",
+                "categories"
+              ]
+            },
+            "description": "List categories"
+          },
+          "response": []
+        },
+        {
+          "name": "Create a category",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/blog/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "blog",
+                "categories"
+              ]
+            },
+            "description": "Create a category",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"string\",\n  \"color\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete a category that holds no articles",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/blog/categories/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "blog",
+                "categories",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Delete a category that holds no articles"
+          },
+          "response": []
+        },
+        {
+          "name": "List articles without their bodies; drafts are admin-only",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/blog/posts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "blog",
+                "posts"
+              ],
+              "query": [
+                {
+                  "key": "categoryId",
+                  "value": "1",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "string",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Zero-based page index (0..N)",
+                  "disabled": true
+                },
+                {
+                  "key": "size",
+                  "value": "1",
+                  "description": "The size of the page to be returned",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "['string']",
+                  "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "List articles without their bodies; drafts are admin-only"
+          },
+          "response": []
+        },
+        {
+          "name": "Write an article; the slug comes from the title and never moves",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/blog/posts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "blog",
+                "posts"
+              ]
+            },
+            "description": "Write an article; the slug comes from the title and never moves",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"string\",\n  \"excerpt\": \"string\",\n  \"content\": \"string\",\n  \"categoryId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Read an article by its public URL; this counts a view",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/blog/posts/by-slug/:slug",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "blog",
+                "posts",
+                "by-slug",
+                ":slug"
+              ],
+              "variable": [
+                {
+                  "key": "slug",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Read an article by its public URL; this counts a view"
+          },
+          "response": []
+        },
+        {
+          "name": "Read an article by id, for the editor; this does not count a view",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/blog/posts/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "blog",
+                "posts",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Read an article by id, for the editor; this does not count a view"
+          },
+          "response": []
+        },
+        {
+          "name": "Update an article; the reading time is recomputed",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/blog/posts/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "blog",
+                "posts",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Update an article; the reading time is recomputed",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"string\",\n  \"excerpt\": \"string\",\n  \"content\": \"string\",\n  \"categoryId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete an article and its cover",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/blog/posts/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "blog",
+                "posts",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Delete an article and its cover"
+          },
+          "response": []
+        },
+        {
+          "name": "Attach or replace the cover image",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/blog/posts/:id/cover",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "blog",
+                "posts",
+                ":id",
+                "cover"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Attach or replace the cover image",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Publish an article",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/blog/posts/:id/publish",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "blog",
+                "posts",
+                ":id",
+                "publish"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Publish an article"
+          },
+          "response": []
+        },
+        {
+          "name": "Send an article back to draft; it keeps its slug and its views",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/blog/posts/:id/unpublish",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "blog",
+                "posts",
+                ":id",
+                "unpublish"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Send an article back to draft; it keeps its slug and its views"
+          },
+          "response": []
+        }
+      ],
+      "description": "12 endpoints"
+    },
+    {
+      "name": "Curriculum",
+      "item": [
+        {
+          "name": "Update a chapter, optionally moving it",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/chapters/:chapterId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "chapters",
+                ":chapterId"
+              ],
+              "variable": [
+                {
+                  "key": "chapterId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Update a chapter, optionally moving it",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"string\",\n  \"summary\": \"string\",\n  \"position\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete a chapter with its lessons",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/chapters/:chapterId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "chapters",
+                ":chapterId"
+              ],
+              "variable": [
+                {
+                  "key": "chapterId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Delete a chapter with its lessons"
+          },
+          "response": []
+        },
+        {
+          "name": "Add a lesson; omit position to append",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/chapters/:chapterId/lessons",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "chapters",
+                ":chapterId",
+                "lessons"
+              ],
+              "variable": [
+                {
+                  "key": "chapterId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Add a lesson; omit position to append",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"string\",\n  \"type\": \"VIDEO\",\n  \"durationMinutes\": 1,\n  \"contentUrl\": \"string\",\n  \"content\": \"string\",\n  \"position\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Move a chapter; the siblings are renumbered",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/chapters/:chapterId/position",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "chapters",
+                ":chapterId",
+                "position"
+              ],
+              "variable": [
+                {
+                  "key": "chapterId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Move a chapter; the siblings are renumbered",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"position\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add a chapter; omit position to append",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/courses/:courseId/chapters",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "courses",
+                ":courseId",
+                "chapters"
+              ],
+              "variable": [
+                {
+                  "key": "courseId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Add a chapter; omit position to append",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"string\",\n  \"summary\": \"string\",\n  \"position\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update a lesson, optionally moving it",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/lessons/:lessonId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "lessons",
+                ":lessonId"
+              ],
+              "variable": [
+                {
+                  "key": "lessonId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Update a lesson, optionally moving it",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"string\",\n  \"type\": \"VIDEO\",\n  \"durationMinutes\": 1,\n  \"contentUrl\": \"string\",\n  \"content\": \"string\",\n  \"position\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete a lesson",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/lessons/:lessonId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "lessons",
+                ":lessonId"
+              ],
+              "variable": [
+                {
+                  "key": "lessonId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Delete a lesson"
+          },
+          "response": []
+        },
+        {
+          "name": "Move a lesson within its chapter",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/lessons/:lessonId/position",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "lessons",
+                ":lessonId",
+                "position"
+              ],
+              "variable": [
+                {
+                  "key": "lessonId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Move a lesson within its chapter",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"position\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "8 endpoints"
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Section-wide figures, submissions per day and the next deadlines",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/dashboard/admin",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "dashboard",
+                "admin"
+              ]
+            },
+            "description": "Section-wide figures, submissions per day and the next deadlines"
+          },
+          "response": []
+        },
+        {
+          "name": "My progress, my average and what I still owe",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/dashboard/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "dashboard",
+                "me"
+              ]
+            },
+            "description": "My progress, my average and what I still owe"
+          },
+          "response": []
+        }
+      ],
+      "description": "2 endpoints"
+    },
+    {
+      "name": "Demandes d'accès",
+      "item": [
+        {
+          "name": "The queue; filter by status to see only what is still waiting",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/access-requests",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "access-requests"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "PENDING",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Zero-based page index (0..N)",
+                  "disabled": true
+                },
+                {
+                  "key": "size",
+                  "value": "1",
+                  "description": "The size of the page to be returned",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "['string']",
+                  "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "The queue; filter by status to see only what is still waiting"
+          },
+          "response": []
+        },
+        {
+          "name": "Ask for access. Always answers 202, whatever the address turns out to be",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/access-requests",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "access-requests"
+              ]
+            },
+            "description": "Ask for access. Always answers 202, whatever the address turns out to be",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"string\",\n  \"email\": \"string\",\n  \"level\": \"SECOND_AS\",\n  \"message\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Approve and create the student's account, returning its one-time password",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/access-requests/:id/approve",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "access-requests",
+                ":id",
+                "approve"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Approve and create the student's account, returning its one-time password"
+          },
+          "response": []
+        },
+        {
+          "name": "Refuse the request, with a note for your own record",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/access-requests/:id/reject",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "access-requests",
+                ":id",
+                "reject"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Refuse the request, with a note for your own record",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"note\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "4 endpoints"
+    },
+    {
+      "name": "Modules",
+      "item": [
+        {
+          "name": "List modules; a student only ever sees their own level",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/courses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "courses"
+              ],
+              "query": [
+                {
+                  "key": "level",
+                  "value": "SECOND_AS",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Zero-based page index (0..N)",
+                  "disabled": true
+                },
+                {
+                  "key": "size",
+                  "value": "1",
+                  "description": "The size of the page to be returned",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "['string']",
+                  "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "List modules; a student only ever sees their own level"
+          },
+          "response": []
+        },
+        {
+          "name": "Create a module",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/courses",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "courses"
+              ]
+            },
+            "description": "Create a module",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"string\",\n  \"title\": \"string\",\n  \"description\": \"string\",\n  \"level\": \"SECOND_AS\",\n  \"color\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "One module with its chapters and lessons, flagged with what the student finished",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/courses/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "courses",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "One module with its chapters and lessons, flagged with what the student finished"
+          },
+          "response": []
+        },
+        {
+          "name": "Update a module",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/courses/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "courses",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Update a module",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"string\",\n  \"title\": \"string\",\n  \"description\": \"string\",\n  \"level\": \"SECOND_AS\",\n  \"color\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete a module with its chapters and lessons",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/courses/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "courses",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Delete a module with its chapters and lessons"
+          },
+          "response": []
+        }
+      ],
+      "description": "5 endpoints"
+    },
+    {
+      "name": "Notes",
+      "item": [
+        {
+          "name": "Every student's marks and average in this module",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/courses/:courseId/gradebook",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "courses",
+                ":courseId",
+                "gradebook"
+              ],
+              "variable": [
+                {
+                  "key": "courseId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Every student's marks and average in this module"
+          },
+          "response": []
+        },
+        {
+          "name": "Record a mark by hand, e.g. a partiel",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/courses/:courseId/grades",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "courses",
+                ":courseId",
+                "grades"
+              ],
+              "variable": [
+                {
+                  "key": "courseId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Record a mark by hand, e.g. a partiel",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentId\": 1,\n  \"label\": \"string\",\n  \"score\": 1.0,\n  \"maxScore\": 1.0,\n  \"weight\": 1.0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove a hand-entered mark",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/grades/:gradeId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "grades",
+                ":gradeId"
+              ],
+              "variable": [
+                {
+                  "key": "gradeId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Remove a hand-entered mark"
+          },
+          "response": []
+        },
+        {
+          "name": "My average in each module",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/my/averages",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "my",
+                "averages"
+              ]
+            },
+            "description": "My average in each module"
+          },
+          "response": []
+        },
+        {
+          "name": "My marks in one module",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/my/grades/:courseId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "my",
+                "grades",
+                ":courseId"
+              ],
+              "variable": [
+                {
+                  "key": "courseId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "My marks in one module"
+          },
+          "response": []
+        }
+      ],
+      "description": "5 endpoints"
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Recent activity; a student sees their own level",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/activity",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "activity"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Zero-based page index (0..N)",
+                  "disabled": true
+                },
+                {
+                  "key": "size",
+                  "value": "1",
+                  "description": "The size of the page to be returned",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "['string']",
+                  "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Recent activity; a student sees their own level"
+          },
+          "response": []
+        },
+        {
+          "name": "My notifications, newest first",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/my/notifications",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "my",
+                "notifications"
+              ],
+              "query": [
+                {
+                  "key": "onlyUnread",
+                  "value": "True",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Zero-based page index (0..N)",
+                  "disabled": true
+                },
+                {
+                  "key": "size",
+                  "value": "1",
+                  "description": "The size of the page to be returned",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "['string']",
+                  "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "My notifications, newest first"
+          },
+          "response": []
+        },
+        {
+          "name": "Mark everything read; returns how many were still unread",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/my/notifications/read-all",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "my",
+                "notifications",
+                "read-all"
+              ]
+            },
+            "description": "Mark everything read; returns how many were still unread"
+          },
+          "response": []
+        },
+        {
+          "name": "How many are unread; this drives the badge",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/my/notifications/unread-count",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "my",
+                "notifications",
+                "unread-count"
+              ]
+            },
+            "description": "How many are unread; this drives the badge"
+          },
+          "response": []
+        },
+        {
+          "name": "Mark one as read",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/my/notifications/:id/read",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "my",
+                "notifications",
+                ":id",
+                "read"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Mark one as read"
+          },
+          "response": []
+        }
+      ],
+      "description": "5 endpoints"
+    },
+    {
+      "name": "Profile",
+      "item": [
+        {
+          "name": "Read my profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "me"
+              ]
+            },
+            "description": "Read my profile"
+          },
+          "response": []
+        },
+        {
+          "name": "Update my name and preferences",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "me"
+              ]
+            },
+            "description": "Update my name and preferences",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"string\",\n  \"locale\": \"string\",\n  \"notifyByEmail\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change my password; this signs out every other session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/me/password",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "me",
+                "password"
+              ]
+            },
+            "description": "Change my password; this signs out every other session",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"string\",\n  \"newPassword\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "3 endpoints"
+    },
+    {
+      "name": "Progress",
+      "item": [
+        {
+          "name": "Mark a lesson as finished",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/lessons/:lessonId/completion",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "lessons",
+                ":lessonId",
+                "completion"
+              ],
+              "variable": [
+                {
+                  "key": "lessonId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Mark a lesson as finished"
+          },
+          "response": []
+        },
+        {
+          "name": "Mark a lesson as unfinished again",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/lessons/:lessonId/completion",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "lessons",
+                ":lessonId",
+                "completion"
+              ],
+              "variable": [
+                {
+                  "key": "lessonId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Mark a lesson as unfinished again"
+          },
+          "response": []
+        }
+      ],
+      "description": "2 endpoints"
+    },
+    {
+      "name": "Quiz attempts",
+      "item": [
+        {
+          "name": "Read one of my attempts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/attempts/:attemptId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "attempts",
+                ":attemptId"
+              ],
+              "variable": [
+                {
+                  "key": "attemptId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Read one of my attempts"
+          },
+          "response": []
+        },
+        {
+          "name": "Save answers; send only the questions that changed",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/attempts/:attemptId/answers",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "attempts",
+                ":attemptId",
+                "answers"
+              ],
+              "variable": [
+                {
+                  "key": "attemptId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Save answers; send only the questions that changed",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answers\": [\n    {\n      \"questionId\": null,\n      \"selectedChoiceIds\": null,\n      \"textAnswer\": null\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Hand in the attempt; choice questions are scored immediately",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/attempts/:attemptId/submit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "attempts",
+                ":attemptId",
+                "submit"
+              ],
+              "variable": [
+                {
+                  "key": "attemptId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Hand in the attempt; choice questions are scored immediately"
+          },
+          "response": []
+        },
+        {
+          "name": "The quizzes open to me, with how many attempts I have used",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/my/quizzes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "my",
+                "quizzes"
+              ],
+              "query": [
+                {
+                  "key": "courseId",
+                  "value": "1",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Zero-based page index (0..N)",
+                  "disabled": true
+                },
+                {
+                  "key": "size",
+                  "value": "1",
+                  "description": "The size of the page to be returned",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "['string']",
+                  "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "The quizzes open to me, with how many attempts I have used"
+          },
+          "response": []
+        },
+        {
+          "name": "Start a quiz, or resume the attempt already in progress",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quizzes/:quizId/attempts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "quizzes",
+                ":quizId",
+                "attempts"
+              ],
+              "variable": [
+                {
+                  "key": "quizId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Start a quiz, or resume the attempt already in progress"
+          },
+          "response": []
+        }
+      ],
+      "description": "5 endpoints"
+    },
+    {
+      "name": "Quiz authoring",
+      "item": [
+        {
+          "name": "Create a quiz as a draft",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/courses/:courseId/quizzes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "courses",
+                ":courseId",
+                "quizzes"
+              ],
+              "variable": [
+                {
+                  "key": "courseId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Create a quiz as a draft",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"string\",\n  \"description\": \"string\",\n  \"durationMinutes\": 1,\n  \"opensAt\": \"2026-10-01T09:00:00Z\",\n  \"deadline\": \"2026-10-01T09:00:00Z\",\n  \"maxAttempts\": 1,\n  \"shuffleQuestions\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update a question; the choices sent replace the existing ones",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/questions/:questionId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "questions",
+                ":questionId"
+              ],
+              "variable": [
+                {
+                  "key": "questionId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Update a question; the choices sent replace the existing ones",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"string\",\n  \"type\": \"SINGLE_CHOICE\",\n  \"points\": 1.0,\n  \"choices\": [\n    {\n      \"text\": null,\n      \"correct\": null\n    }\n  ],\n  \"position\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete a question; the remaining ones are renumbered",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/questions/:questionId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "questions",
+                ":questionId"
+              ],
+              "variable": [
+                {
+                  "key": "questionId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Delete a question; the remaining ones are renumbered"
+          },
+          "response": []
+        },
+        {
+          "name": "List quizzes, drafts included",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quizzes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "quizzes"
+              ],
+              "query": [
+                {
+                  "key": "courseId",
+                  "value": "1",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Zero-based page index (0..N)",
+                  "disabled": true
+                },
+                {
+                  "key": "size",
+                  "value": "1",
+                  "description": "The size of the page to be returned",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "['string']",
+                  "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "List quizzes, drafts included"
+          },
+          "response": []
+        },
+        {
+          "name": "One quiz with its questions, the answer key and submission stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quizzes/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "quizzes",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "One quiz with its questions, the answer key and submission stats"
+          },
+          "response": []
+        },
+        {
+          "name": "Update a quiz's settings",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quizzes/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "quizzes",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Update a quiz's settings",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"string\",\n  \"description\": \"string\",\n  \"durationMinutes\": 1,\n  \"opensAt\": \"2026-10-01T09:00:00Z\",\n  \"deadline\": \"2026-10-01T09:00:00Z\",\n  \"maxAttempts\": 1,\n  \"shuffleQuestions\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete a quiz with its questions and attempts",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quizzes/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "quizzes",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Delete a quiz with its questions and attempts"
+          },
+          "response": []
+        },
+        {
+          "name": "Open or close a quiz; opening requires at least one question",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quizzes/:id/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "quizzes",
+                ":id",
+                "status"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Open or close a quiz; opening requires at least one question",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"DRAFT\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add a question with its choices; only while the quiz is a draft",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/quizzes/:quizId/questions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "quizzes",
+                ":quizId",
+                "questions"
+              ],
+              "variable": [
+                {
+                  "key": "quizId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Add a question with its choices; only while the quiz is a draft",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"string\",\n  \"type\": \"SINGLE_CHOICE\",\n  \"points\": 1.0,\n  \"choices\": [\n    {\n      \"text\": null,\n      \"correct\": null\n    }\n  ],\n  \"position\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "9 endpoints"
+    },
+    {
+      "name": "Ressources",
+      "item": [
+        {
+          "name": "List resources; a student sees only what is shared with their level",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/resources",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "resources"
+              ],
+              "query": [
+                {
+                  "key": "courseId",
+                  "value": "1",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "type",
+                  "value": "PDF",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "string",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Zero-based page index (0..N)",
+                  "disabled": true
+                },
+                {
+                  "key": "size",
+                  "value": "1",
+                  "description": "The size of the page to be returned",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "['string']",
+                  "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "List resources; a student sees only what is shared with their level"
+          },
+          "response": []
+        },
+        {
+          "name": "Add a resource; send a file for everything but a LINK",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/resources",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "resources"
+              ]
+            },
+            "description": "Add a resource; send a file for everything but a LINK",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "resource",
+                  "type": "text",
+                  "value": "{'title': 'string', 'description': 'string', 'type': 'PDF', 'courseId': 1, 'level': 'SECOND_AS', 'externalUrl': 'string'}"
+                },
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "One resource",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/resources/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "resources",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "One resource"
+          },
+          "response": []
+        },
+        {
+          "name": "Update a resource's details; the file itself cannot be swapped",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/resources/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "resources",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Update a resource's details; the file itself cannot be swapped",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"string\",\n  \"description\": \"string\",\n  \"type\": \"PDF\",\n  \"courseId\": 1,\n  \"level\": \"SECOND_AS\",\n  \"externalUrl\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete a resource and its file",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/resources/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "resources",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Delete a resource and its file"
+          },
+          "response": []
+        },
+        {
+          "name": "Download the file and count the download",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/resources/:id/download",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "resources",
+                ":id",
+                "download"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Download the file and count the download"
+          },
+          "response": []
+        }
+      ],
+      "description": "6 endpoints"
+    },
+    {
+      "name": "Submissions",
+      "item": [
+        {
+          "name": "My submission for this assignment",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/assignments/:assignmentId/submission",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments",
+                ":assignmentId",
+                "submission"
+              ],
+              "variable": [
+                {
+                  "key": "assignmentId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "My submission for this assignment"
+          },
+          "response": []
+        },
+        {
+          "name": "Create or update my draft for this assignment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/assignments/:assignmentId/submission",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments",
+                ":assignmentId",
+                "submission"
+              ],
+              "variable": [
+                {
+                  "key": "assignmentId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Create or update my draft for this assignment",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"comment\": \"string\",\n  \"partnerId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Attach a file to my draft",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/assignments/:assignmentId/submission/files",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments",
+                ":assignmentId",
+                "submission",
+                "files"
+              ],
+              "variable": [
+                {
+                  "key": "assignmentId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Attach a file to my draft",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Hand in my work; after this it can no longer be changed",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/assignments/:assignmentId/submission/submit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments",
+                ":assignmentId",
+                "submission",
+                "submit"
+              ],
+              "variable": [
+                {
+                  "key": "assignmentId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Hand in my work; after this it can no longer be changed"
+          },
+          "response": []
+        },
+        {
+          "name": "The submissions for one assignment; pending ones first with onlyPending",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/assignments/:assignmentId/submissions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments",
+                ":assignmentId",
+                "submissions"
+              ],
+              "query": [
+                {
+                  "key": "onlyPending",
+                  "value": "True",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Zero-based page index (0..N)",
+                  "disabled": true
+                },
+                {
+                  "key": "size",
+                  "value": "1",
+                  "description": "The size of the page to be returned",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "['string']",
+                  "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+                  "disabled": true
+                }
+              ],
+              "variable": [
+                {
+                  "key": "assignmentId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "The submissions for one assignment; pending ones first with onlyPending"
+          },
+          "response": []
+        },
+        {
+          "name": "Everything I have handed in, from either side of a pair",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/my/submissions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "my",
+                "submissions"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Zero-based page index (0..N)",
+                  "disabled": true
+                },
+                {
+                  "key": "size",
+                  "value": "1",
+                  "description": "The size of the page to be returned",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "['string']",
+                  "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Everything I have handed in, from either side of a pair"
+          },
+          "response": []
+        },
+        {
+          "name": "Download a submitted file",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/submissions/:submissionId/files/:fileId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "submissions",
+                ":submissionId",
+                "files",
+                ":fileId"
+              ],
+              "variable": [
+                {
+                  "key": "submissionId",
+                  "value": "1"
+                },
+                {
+                  "key": "fileId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Download a submitted file"
+          },
+          "response": []
+        },
+        {
+          "name": "Remove a file from my draft",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/submissions/:submissionId/files/:fileId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "submissions",
+                ":submissionId",
+                "files",
+                ":fileId"
+              ],
+              "variable": [
+                {
+                  "key": "submissionId",
+                  "value": "1"
+                },
+                {
+                  "key": "fileId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Remove a file from my draft"
+          },
+          "response": []
+        },
+        {
+          "name": "Mark a submission and leave feedback",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/submissions/:submissionId/grade",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "submissions",
+                ":submissionId",
+                "grade"
+              ],
+              "variable": [
+                {
+                  "key": "submissionId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Mark a submission and leave feedback",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"grade\": 1.0,\n  \"feedback\": \"string\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "9 endpoints"
+    },
+    {
+      "name": "TP & devoirs",
+      "item": [
+        {
+          "name": "List assignments; a student sees only published work at their own level",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments"
+              ],
+              "query": [
+                {
+                  "key": "courseId",
+                  "value": "1",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Zero-based page index (0..N)",
+                  "disabled": true
+                },
+                {
+                  "key": "size",
+                  "value": "1",
+                  "description": "The size of the page to be returned",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "['string']",
+                  "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "List assignments; a student sees only published work at their own level"
+          },
+          "response": []
+        },
+        {
+          "name": "One assignment with its instructions",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/assignments/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "One assignment with its instructions"
+          },
+          "response": []
+        },
+        {
+          "name": "Update an assignment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/assignments/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Update an assignment",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"string\",\n  \"instructions\": \"string\",\n  \"type\": \"TP\",\n  \"mode\": \"INDIVIDUAL\",\n  \"deadline\": \"2026-10-01T09:00:00Z\",\n  \"maxPoints\": 1.0,\n  \"allowLate\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete an assignment with its submissions",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/assignments/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Delete an assignment with its submissions"
+          },
+          "response": []
+        },
+        {
+          "name": "Download the subject sheet",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/assignments/:id/brief",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments",
+                ":id",
+                "brief"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Download the subject sheet"
+          },
+          "response": []
+        },
+        {
+          "name": "Attach or replace the subject sheet",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/assignments/:id/brief",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments",
+                ":id",
+                "brief"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Attach or replace the subject sheet",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Publish or close an assignment",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/assignments/:id/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "assignments",
+                ":id",
+                "status"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Publish or close an assignment",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"DRAFT\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create an assignment as a draft",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/courses/:courseId/assignments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "courses",
+                ":courseId",
+                "assignments"
+              ],
+              "variable": [
+                {
+                  "key": "courseId",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Create an assignment as a draft",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"string\",\n  \"instructions\": \"string\",\n  \"type\": \"TP\",\n  \"mode\": \"INDIVIDUAL\",\n  \"deadline\": \"2026-10-01T09:00:00Z\",\n  \"maxPoints\": 1.0,\n  \"allowLate\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "8 endpoints"
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "List users, filtered and paginated; every filter is optional",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "role",
+                  "value": "ADMIN",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "level",
+                  "value": "SECOND_AS",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "status",
+                  "value": "ACTIVE",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "search",
+                  "value": "string",
+                  "description": "",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Zero-based page index (0..N)",
+                  "disabled": true
+                },
+                {
+                  "key": "size",
+                  "value": "1",
+                  "description": "The size of the page to be returned",
+                  "disabled": true
+                },
+                {
+                  "key": "sort",
+                  "value": "['string']",
+                  "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "List users, filtered and paginated; every filter is optional"
+          },
+          "response": []
+        },
+        {
+          "name": "Create a student account and return its one-time temporary password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users"
+              ]
+            },
+            "description": "Create a student account and return its one-time temporary password",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"string\",\n  \"email\": \"string\",\n  \"level\": \"SECOND_AS\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Read one user — an admin, or the student themselves",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Read one user — an admin, or the student themselves"
+          },
+          "response": []
+        },
+        {
+          "name": "Change a user's status; disabling also revokes their sessions",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/users/:id/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                ":id",
+                "status"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Change a user's status; disabling also revokes their sessions",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ACTIVE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "4 endpoints"
+    }
+  ]
+}
