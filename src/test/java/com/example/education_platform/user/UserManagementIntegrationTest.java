@@ -154,6 +154,35 @@ class UserManagementIntegrationTest {
         assertThat(login(STUDENT, PASSWORD)).hasStatus(401);
     }
 
+    // ---------- password reset ----------
+
+    @Test
+    void adminResetsAStudentPasswordAndOldSessionsEnd() throws Exception {
+        String refreshToken = bodyOf(login(STUDENT, PASSWORD), 200).at("/tokens/refreshToken").asText();
+
+        JsonNode reset = bodyOf(post("/api/v1/users/" + studentId + "/reset-password", adminToken(), "{}"), 200);
+        String temporaryPassword = reset.at("/temporaryPassword").asText();
+
+        assertThat(reset.at("/user/email").asText()).isEqualTo(STUDENT);
+        assertThat(temporaryPassword).isNotBlank();
+        assertThat(login(STUDENT, PASSWORD)).describedAs("the old password stops working").hasStatus(401);
+        assertThat(login(STUDENT, temporaryPassword)).hasStatusOk();
+        assertThat(post("/api/v1/auth/refresh", null, """
+                {"refreshToken":"%s"}""".formatted(refreshToken)))
+                .describedAs("sessions opened with the old password are revoked").hasStatus(401);
+    }
+
+    @Test
+    void anAdminPasswordCannotBeResetThisWay() {
+        Long adminId = users.findByEmail(ADMIN).orElseThrow().getId();
+        assertThat(post("/api/v1/users/" + adminId + "/reset-password", adminToken(), "{}")).hasStatus(422);
+    }
+
+    @Test
+    void aStudentCannotResetPasswords() {
+        assertThat(post("/api/v1/users/" + studentId + "/reset-password", studentToken(), "{}")).hasStatus(403);
+    }
+
     // ---------- profile ----------
 
     @Test

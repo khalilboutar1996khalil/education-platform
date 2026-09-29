@@ -2,6 +2,7 @@ package com.example.education_platform.user.service.impl;
 
 import com.example.education_platform.auth.repository.RefreshTokenRepository;
 import com.example.education_platform.common.PageResponse;
+import com.example.education_platform.common.exception.BusinessException;
 import com.example.education_platform.common.exception.ConflictException;
 import com.example.education_platform.common.exception.ResourceNotFoundException;
 import com.example.education_platform.mail.service.EmailService;
@@ -11,6 +12,7 @@ import com.example.education_platform.user.dto.request.ChangePasswordRequest;
 import com.example.education_platform.user.dto.request.InviteStudentRequest;
 import com.example.education_platform.user.dto.request.UpdateProfileRequest;
 import com.example.education_platform.user.dto.response.InviteStudentResponse;
+import com.example.education_platform.user.dto.response.PasswordResetResponse;
 import com.example.education_platform.user.dto.response.UserResponse;
 import com.example.education_platform.user.entity.Level;
 import com.example.education_platform.user.entity.Role;
@@ -92,6 +94,21 @@ public class UserServiceImpl implements UserService {
             refreshTokens.revokeAllForUser(user.getId(), Instant.now());
         }
         return userMapper.toResponse(user);
+    }
+
+    @Override
+    @Transactional
+    public PasswordResetResponse resetPassword(Long id) {
+        User user = users.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", id));
+        if (user.isAdmin()) {
+            // An admin changes their own password from the profile, proving they know the current one
+            throw new BusinessException("Only a student's password can be reset this way");
+        }
+        String temporaryPassword = temporaryPassword();
+        user.setPasswordHash(passwordEncoder.encode(temporaryPassword));
+        // Whoever held the old password may still be signed in somewhere
+        refreshTokens.revokeAllForUser(user.getId(), Instant.now());
+        return new PasswordResetResponse(userMapper.toResponse(user), temporaryPassword);
     }
 
     @Override

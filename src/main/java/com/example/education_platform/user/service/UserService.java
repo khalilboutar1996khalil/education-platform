@@ -5,6 +5,7 @@ import com.example.education_platform.user.dto.request.ChangePasswordRequest;
 import com.example.education_platform.user.dto.request.InviteStudentRequest;
 import com.example.education_platform.user.dto.request.UpdateProfileRequest;
 import com.example.education_platform.user.dto.response.InviteStudentResponse;
+import com.example.education_platform.user.dto.response.PasswordResetResponse;
 import com.example.education_platform.user.dto.response.UserResponse;
 import com.example.education_platform.user.entity.Level;
 import com.example.education_platform.user.entity.Role;
@@ -20,6 +21,8 @@ public interface UserService {
     UserResponse getById(Long id);
 
     UserResponse updateStatus(Long id, UserStatus status);
+
+    PasswordResetResponse resetPassword(Long id);
 
     UserResponse getCurrentProfile();
 

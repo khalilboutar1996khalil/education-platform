@@ -23,8 +23,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Fills an empty dev database so Swagger has something to show. Never runs under any other
- * profile, and never touches a database that already holds users or modules.
+ * Fills the dev database so there is something to show. Never runs under any other profile.
+ * The full demo set is only created on an empty database; the admin account and the example
+ * course of each level are added to an existing one when missing.
  */
 @Component
 @Profile("dev")
@@ -33,6 +34,7 @@ public class DevDataSeeder implements ApplicationRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(DevDataSeeder.class);
     private static final String DEMO_PASSWORD = "Passw0rd-Demo";
+    private static final String OWNER_EMAIL = "admin@eduflow.dz";
 
     private final UserRepository users;
     private final CourseRepository courses;
@@ -42,21 +44,24 @@ public class DevDataSeeder implements ApplicationRunner {
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
-        if (users.count() > 0 || courses.count() > 0) {
-            LOG.info("Dev seed skipped — the database already holds data");
+        ensureOwnerAndExampleCourses();
+
+        if (users.count() > 1 || courses.count() > 3) {
+            LOG.info("Dev seed: demo data already present, nothing else to create");
             return;
         }
 
-        users.save(admin("Karim Haddad", "prof@eduflow.dz"));
         User amira = users.save(student("Amira Benali", "amira@eduflow.dz", Level.THIRD_AS));
         User yacine = users.save(student("Yacine Cherif", "yacine@eduflow.dz", Level.THIRD_AS));
         users.save(student("Lina Boudiaf", "lina@eduflow.dz", Level.THIRD_AS));
         users.save(student("Sofiane Meziane", "sofiane@eduflow.dz", Level.SECOND_AS));
         users.save(student("Nadia Cherifi", "nadia@eduflow.dz", Level.SECOND_AS));
 
-        Course algo = courses.save(algorithmique());
+        users.save(student("Rania Trabelsi", "rania@eduflow.dz", Level.FOURTH_AS));
+
+        Course algo = courses.findAll().stream()
+                .filter(course -> course.getCode().equals("INF201")).findFirst().orElseThrow();
         courses.save(basesDeDonnees());
-        courses.save(initiation());
         courses.save(bureautique());
 
         // Different progress per student, so the percentages on the Modules screen are not all equal
@@ -64,8 +69,22 @@ public class DevDataSeeder implements ApplicationRunner {
         firstChapter.forEach(lesson -> completions.save(new LessonCompletion(amira, lesson)));
         completions.save(new LessonCompletion(yacine, firstChapter.getFirst()));
 
-        LOG.info("Dev seed: {} users and {} modules created. Log in as prof@eduflow.dz (admin) "
+        LOG.info("Dev seed: {} users and {} modules created. Log in as " + OWNER_EMAIL + " (admin) "
                 + "or amira@eduflow.dz (student), password {}", users.count(), courses.count(), DEMO_PASSWORD);
+    }
+
+    /** Idempotent: safe on a database that already holds data. */
+    private void ensureOwnerAndExampleCourses() {
+        if (!users.existsByEmail(OWNER_EMAIL)) {
+            users.save(admin("Mohamed Khalil Boutar", OWNER_EMAIL));
+            LOG.info("Dev seed: admin {} created, password {}", OWNER_EMAIL, DEMO_PASSWORD);
+        }
+        List.of(initiation(), algorithmique(), tableurEtBasesDeDonnees()).forEach(course -> {
+            if (!courses.existsByCodeIgnoreCase(course.getCode())) {
+                courses.save(course);
+                LOG.info("Dev seed: example module {} created", course.getCode());
+            }
+        });
     }
 
     private User admin(String fullName, String email) {
@@ -136,6 +155,32 @@ public class DevDataSeeder implements ApplicationRunner {
         Chapter texte = course.addChapter(new Chapter("Traitement de texte", null), null);
         texte.addLesson(new Lesson("Mise en forme d'un document", LessonType.VIDEO, 10), null);
         texte.addLesson(new Lesson("TP — Rédiger un rapport", LessonType.TASK, null), null);
+        return course;
+    }
+
+    private static Course tableurEtBasesDeDonnees() {
+        Course course = new Course("INF401", "Tableur et bases de données",
+                "Organiser, calculer et analyser des données — 4ᵉ AS lettres, économie et gestion.",
+                Level.FOURTH_AS, "#0891B2");
+
+        Chapter tableur = course.addChapter(new Chapter("Le tableur",
+                "Formules, fonctions et graphiques."), null);
+        tableur.addLesson(new Lesson("Formules et références de cellules", LessonType.VIDEO, 15), null);
+        tableur.addLesson(new Lesson("Fonctions usuelles : SOMME, MOYENNE, SI", LessonType.VIDEO, 18), null);
+        tableur.addLesson(new Lesson("Créer un graphique", LessonType.VIDEO, 12), null);
+        tableur.addLesson(new Lesson("Quiz — le tableur", LessonType.QUIZ, 10), null);
+        tableur.addLesson(new Lesson("TP n°1 — Budget d'une entreprise", LessonType.TASK, null), null);
+
+        Chapter bdd = course.addChapter(new Chapter("Les bases de données",
+                "Tables, requêtes et formulaires."), null);
+        bdd.addLesson(new Lesson("Tables et relations", LessonType.VIDEO, 17), null);
+        bdd.addLesson(new Lesson("Requêtes de sélection", LessonType.VIDEO, 20), null);
+        bdd.addLesson(new Lesson("Fiche — vocabulaire des bases de données", LessonType.PDF, null), null);
+        bdd.addLesson(new Lesson("TP n°2 — Gérer une bibliothèque", LessonType.TASK, null), null);
+
+        Chapter multimedia = course.addChapter(new Chapter("Internet et multimédia", null), null);
+        multimedia.addLesson(new Lesson("Recherche d'information et droits d'auteur", LessonType.VIDEO, 14), null);
+        multimedia.addLesson(new Lesson("Quiz — internet et multimédia", LessonType.QUIZ, 10), null);
         return course;
     }
 }

@@ -12,6 +12,7 @@ import com.example.education_platform.course.repository.LessonRepository;
 import com.example.education_platform.dashboard.dto.response.AdminDashboardResponse;
 import com.example.education_platform.dashboard.dto.response.DayCountResponse;
 import com.example.education_platform.dashboard.dto.response.DeadlineResponse;
+import com.example.education_platform.dashboard.dto.response.LevelCountResponse;
 import com.example.education_platform.dashboard.dto.response.StudentDashboardResponse;
 import com.example.education_platform.grade.service.GradebookService;
 import com.example.education_platform.notification.repository.NotificationRepository;
@@ -75,7 +76,15 @@ public class DashboardQueries {
                 assignments.countByStatus(AssignmentStatus.OPEN),
                 submissions.countByStatusIn(AWAITING_MARKING),
                 weeklySubmissions(now),
-                upcomingDeadlines(null, now));
+                upcomingDeadlines(null, now),
+                perLevel(level -> users.countStudents(Role.STUDENT, UserStatus.ACTIVE, level)),
+                perLevel(courses::countByLevel));
+    }
+
+    private static List<LevelCountResponse> perLevel(java.util.function.ToLongFunction<Level> counter) {
+        return java.util.Arrays.stream(Level.values())
+                .map(level -> new LevelCountResponse(level, counter.applyAsLong(level)))
+                .toList();
     }
 
     @Cacheable(cacheNames = CacheConfig.DASHBOARD_CACHE, key = "'student:' + #studentId")

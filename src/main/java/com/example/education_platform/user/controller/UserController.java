@@ -4,6 +4,7 @@ import com.example.education_platform.common.PageResponse;
 import com.example.education_platform.user.dto.request.InviteStudentRequest;
 import com.example.education_platform.user.dto.request.UpdateUserStatusRequest;
 import com.example.education_platform.user.dto.response.InviteStudentResponse;
+import com.example.education_platform.user.dto.response.PasswordResetResponse;
 import com.example.education_platform.user.dto.response.UserResponse;
 import com.example.education_platform.user.entity.Level;
 import com.example.education_platform.user.entity.Role;
@@ -69,5 +70,12 @@ public class UserController {
     @Operation(summary = "Change a user's status; disabling also revokes their sessions")
     UserResponse updateStatus(@PathVariable Long id, @Valid @RequestBody UpdateUserStatusRequest request) {
         return userService.updateStatus(id, request.status());
+    }
+
+    @PostMapping("/{id}/reset-password")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Give a student a new one-time temporary password; this signs them out everywhere")
+    PasswordResetResponse resetPassword(@PathVariable Long id) {
+        return userService.resetPassword(id);
     }
 }

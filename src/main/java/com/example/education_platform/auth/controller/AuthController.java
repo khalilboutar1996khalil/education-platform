@@ -38,7 +38,7 @@ public class AuthController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    @Operation(summary = "Create a student account from a class code and sign in, in one call")
+    @Operation(summary = "Create a student account for the chosen level and sign in, in one call")
     LoginResponse register(@Valid @RequestBody RegisterRequest request, HttpServletRequest http) {
         return authService.register(request, http.getHeader("User-Agent"), http.getRemoteAddr());
     }

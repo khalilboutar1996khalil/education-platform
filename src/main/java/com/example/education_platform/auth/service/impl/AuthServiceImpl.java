@@ -9,8 +9,6 @@ import com.example.education_platform.auth.entity.RefreshToken;
 import com.example.education_platform.auth.repository.PasswordResetTokenRepository;
 import com.example.education_platform.auth.repository.RefreshTokenRepository;
 import com.example.education_platform.auth.service.AuthService;
-import com.example.education_platform.classcode.entity.ClassCode;
-import com.example.education_platform.classcode.repository.ClassCodeRepository;
 import com.example.education_platform.common.exception.BusinessException;
 import com.example.education_platform.common.exception.ConflictException;
 import com.example.education_platform.common.exception.InvalidRefreshTokenException;
@@ -54,7 +52,6 @@ public class AuthServiceImpl implements AuthService {
     private final LoginRateLimiter rateLimiter;
     private final PasswordResetTokenRepository resetTokens;
     private final EmailService emailService;
-    private final ClassCodeRepository classCodes;
 
     @Override
     @Transactional
@@ -79,10 +76,6 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public LoginResponse register(RegisterRequest request, String userAgent, String ipAddress) {
-        ClassCode classCode = classCodes
-                .findByCodeIgnoreCaseAndActiveTrue(ClassCode.normalise(request.classCode()))
-                .orElseThrow(() -> new BusinessException("Code de classe invalide ou expiré"));
-
         String email = normalise(request.email());
         if (users.existsByEmail(email)) {
             // Said plainly on purpose: whoever is registering already knows this address is theirs,
@@ -90,9 +83,8 @@ public class AuthServiceImpl implements AuthService {
             throw new ConflictException("Un compte existe déjà pour cette adresse email");
         }
 
-        // The level comes from the code, never from the request, so a 2ᵉ AS code cannot open 3ᵉ AS.
         User user = users.save(new User(request.fullName().trim(), email,
-                passwordEncoder.encode(request.password()), Role.STUDENT, classCode.getLevel()));
+                passwordEncoder.encode(request.password()), Role.STUDENT, request.level()));
 
         return new LoginResponse(issueTokens(user, userAgent, ipAddress), userMapper.toResponse(user));
     }

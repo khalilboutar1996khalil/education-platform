@@ -15,6 +15,8 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
     boolean existsByCodeIgnoreCase(String code);
 
+    long countByLevel(Level level);
+
     boolean existsByCodeIgnoreCaseAndIdNot(String code, Long id);
 
     /** A null level means "every level", which is what an admin sees. */
