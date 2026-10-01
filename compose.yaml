@@ -1,4 +1,4 @@
-# The whole stack: Postgres plus the API.
+# Local stack: Postgres plus the API. For a real server use compose.prod.yaml instead.
 #
 #   docker compose up --build
 #
@@ -14,7 +14,8 @@ services:
       POSTGRES_USER: eduflow
       POSTGRES_PASSWORD: ${DB_PASSWORD:-eduflow}
     ports:
-      - "5432:5432"
+      # Bound to this machine only: never reachable from the network
+      - "127.0.0.1:5432:5432"
     volumes:
       - eduflow-data:/var/lib/postgresql/data
     healthcheck:

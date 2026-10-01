@@ -193,6 +193,17 @@ SpotBugs was tried as a free stand-in and removed too: it cannot read Java 26 cl
 broke the build on the development machine. The quality gate is therefore Checkstyle (maxWarnings=0),
 the JaCoCo 70 % floor and 291 tests, all enforced on every push by CI.
 
+### Step 11 — Deployment (Hostinger VPS)
+- [x] First admin created from `ADMIN_EMAIL` / `ADMIN_PASSWORD` on an empty database
+- [x] `compose.prod.yaml`: Caddy (Angular + HTTPS + reverse proxy) as the only public service; API and PostgreSQL private
+- [x] Dev `compose.yaml` binds PostgreSQL to 127.0.0.1 only
+- [x] SMTP settings for production, `.env.production.example`
+- [x] `deploy/backup.sh` (database + uploads, 14 days) and `docs/DEPLOYMENT.md`
+- [ ] Order the VPS, deploy, log in as admin
+- [ ] Domain name + HTTPS
+- [ ] SMTP account (Brevo) for real e-mails
+- **Done when:** the platform answers on the VPS address and the admin can log in.
+
 ---
 
 ## 5. Open decisions

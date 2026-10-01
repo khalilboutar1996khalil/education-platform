@@ -1,6 +1,14 @@
 # Production. Every secret must come from environment variables — there are no defaults here,
 # so the app refuses to start if one is missing.
 
+spring:
+  mail:
+    # Host, port, username and password come from SPRING_MAIL_* (see .env.production.example);
+    # the SMTP sender stays off until SPRING_MAIL_HOST is set.
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
 management:
   endpoint:
     health:
