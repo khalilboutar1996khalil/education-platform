@@ -1,0 +1,38 @@
+# SITE_ADDRESS decides how the platform is reached:
+#   unset / ":80"        -> plain HTTP on the server's IP address (first test, no domain yet)
+#   "eduflow.example.dz" -> HTTPS, certificate obtained and renewed automatically by Caddy
+{$SITE_ADDRESS::80} {
+	encode zstd gzip
+
+	# The Spring Boot API. Caddy keeps the Host header, so browser calls stay same-origin
+	# and need no CORS configuration.
+	handle /api/* {
+		reverse_proxy api:8080
+	}
+
+	# Health check only; the rest of Actuator stays private
+	handle /actuator/health {
+		reverse_proxy api:8080
+	}
+
+	# The Angular single-page app: unknown paths fall back to index.html so deep links work
+	handle {
+		root * /srv
+		try_files {path} /index.html
+		file_server
+	}
+
+	# index.html must never be cached, or users keep running the previous release;
+	# the hashed .js/.css files next to it can be cached forever.
+	@index path / /index.html
+	header @index Cache-Control "no-cache"
+	@assets path *.js *.css *.woff2
+	header @assets Cache-Control "public, max-age=31536000, immutable"
+
+	header {
+		-Server
+		X-Content-Type-Options nosniff
+		X-Frame-Options DENY
+		Referrer-Policy strict-origin-when-cross-origin
+	}
+}

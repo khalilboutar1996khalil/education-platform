@@ -18,6 +18,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByEmail(String email);
 
+    /** Whether the platform already has someone able to administer it. */
+    boolean existsByRole(Role role);
+
     /** Denominator of a module's class average. */
     long countByRoleAndLevelAndStatus(Role role, Level level, UserStatus status);
 

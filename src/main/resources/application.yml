@@ -62,6 +62,12 @@ springdoc:
     path: /swagger-ui.html
 
 app:
+  bootstrap:
+    # First admin of an empty database (production). Ignored as soon as any admin exists.
+    admin:
+      email: ${ADMIN_EMAIL:}
+      password: ${ADMIN_PASSWORD:}
+      full-name: ${ADMIN_FULL_NAME:Administrateur}
   jwt:
     # Base64 key, at least 256 bits. Generate one with: openssl rand -base64 32
     # No default on purpose — production must fail to start rather than sign with a known key.

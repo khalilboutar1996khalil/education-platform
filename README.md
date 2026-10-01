@@ -95,6 +95,11 @@ Options for the server:
 - **SonarQube Community** locally — download the zip from sonarsource.com, or run it with Docker.
 - Meanwhile, the **SonarQube for IDE** plugin (IntelliJ / VS Code) shows the same issues while you type.
 
+## Deploy
+
+Production runs on a single server with `compose.prod.yaml` (Caddy + Angular, API, PostgreSQL).
+Step-by-step guide for a Hostinger VPS: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+
 ## Profiles
 
 | Profile | When | Database | Swagger |

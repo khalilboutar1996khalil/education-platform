@@ -1,0 +1,75 @@
+# Production stack for a single server (e.g. a Hostinger VPS):
+#
+#   web       Caddy: Angular app + HTTPS + reverse proxy  -> the ONLY service open to the internet
+#   api       Spring Boot                                  -> reachable only from "web"
+#   postgres  database                                     -> reachable only from "api"
+#
+# Usage (from this folder, with the Angular project cloned next to it and a filled-in .env):
+#
+#   docker compose -f compose.prod.yaml up -d --build
+#
+# See docs/DEPLOYMENT.md for the full procedure.
+
+services:
+  postgres:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: eduflow
+      POSTGRES_USER: eduflow
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+    # No "ports": the database is never exposed outside the Docker network
+    volumes:
+      - eduflow-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eduflow -d eduflow"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    # Optional settings (ADMIN_*, SPRING_MAIL_*, APP_MAIL_*…) are passed only when present in .env:
+    # an empty SPRING_MAIL_HOST would wrongly switch the SMTP sender on.
+    env_file: .env
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:postgresql://postgres:5432/eduflow
+      DB_USERNAME: eduflow
+      DB_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env, e.g. openssl rand -base64 32}
+      CORS_ALLOWED_ORIGINS: ${PUBLIC_URL:?set PUBLIC_URL in .env}
+      APP_MAIL_BASE_URL: ${PUBLIC_URL}
+    # No "ports": only Caddy talks to the API
+    volumes:
+      # Uploads outlive the container; without this they go when it does
+      - eduflow-uploads:/app/var/uploads
+
+  web:
+    build:
+      context: ./deploy/web
+      additional_contexts:
+        frontend: ${FRONTEND_DIR:-../education-platform-front}
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      # HTTPS certificates: keep them, or Let's Encrypt rate limits hit after a few restarts
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  eduflow-data:
+  eduflow-uploads:
+  caddy-data:
+  caddy-config:
