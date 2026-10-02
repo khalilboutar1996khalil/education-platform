@@ -23,7 +23,8 @@ spring:
       hibernate.jdbc.time_zone: UTC
 
   flyway:
-    locations: classpath:db/migration
+    # db/content is curriculum data (modules, chapters, quizzes); tests leave it out to start empty
+    locations: classpath:db/migration,classpath:db/content
 
   messages:
     fallback-to-system-locale: false   # always serve messages.properties (French), never the JVM's locale
