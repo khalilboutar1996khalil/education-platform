@@ -4,8 +4,6 @@ import com.example.education_platform.common.BaseEntity;
 import com.example.education_platform.user.entity.Level;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import java.util.Locale;
 import lombok.Getter;
@@ -27,7 +25,6 @@ public class ClassCode extends BaseEntity {
     @Column(nullable = false, unique = true, length = 40)
     private String code;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private Level level;
 

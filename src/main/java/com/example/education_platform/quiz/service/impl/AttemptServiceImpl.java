@@ -221,7 +221,7 @@ public class AttemptServiceImpl implements AttemptService {
     }
 
     private static void requireSameLevel(User student, Quiz quiz) {
-        if (quiz.getCourse().getLevel() != student.getLevel()) {
+        if (!quiz.getCourse().getLevel().equals(student.getLevel())) {
             throw new AccessDeniedException("This quiz belongs to another level");
         }
     }

@@ -51,7 +51,7 @@ public class ProgressServiceImpl implements ProgressService {
     private Lesson visibleLesson(Long lessonId, User student) {
         Lesson lesson = lessons.findById(lessonId)
                 .orElseThrow(() -> new ResourceNotFoundException("Lesson", lessonId));
-        if (lesson.getChapter().getCourse().getLevel() != student.getLevel()) {
+        if (!lesson.getChapter().getCourse().getLevel().equals(student.getLevel())) {
             throw new AccessDeniedException("This lesson belongs to another level");
         }
         return lesson;

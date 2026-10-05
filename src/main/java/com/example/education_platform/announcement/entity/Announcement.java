@@ -6,8 +6,6 @@ import com.example.education_platform.user.entity.Level;
 import com.example.education_platform.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -44,7 +42,6 @@ public class Announcement extends BaseEntity {
     private Course course;
 
     /** Null means every level. */
-    @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private Level level;
 
@@ -84,8 +81,8 @@ public class Announcement extends BaseEntity {
         if (studentLevel == null) {
             return true;
         }
-        boolean courseAllows = course == null || course.getLevel() == studentLevel;
-        boolean levelAllows = level == null || level == studentLevel;
+        boolean courseAllows = course == null || course.getLevel().equals(studentLevel);
+        boolean levelAllows = level == null || level.equals(studentLevel);
         return isPublished() && courseAllows && levelAllows;
     }
 
