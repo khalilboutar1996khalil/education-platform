@@ -5,6 +5,9 @@ spring:
     url: ${TEST_DB_URL:jdbc:postgresql://localhost:5432/eduflow_test}
     username: ${TEST_DB_USERNAME:eduflow}
     password: ${TEST_DB_PASSWORD:eduflow}
+  flyway:
+    # Schema only: the curriculum in db/content would break every "the table starts empty" assertion
+    locations: classpath:db/migration
 
 app:
   # A job firing mid-test would move data under an assertion
