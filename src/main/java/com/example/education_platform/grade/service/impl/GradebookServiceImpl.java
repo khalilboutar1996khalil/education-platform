@@ -128,7 +128,7 @@ public class GradebookServiceImpl implements GradebookService {
         if (student.isAdmin()) {
             throw new BusinessException("Only a student can be graded");
         }
-        if (student.getLevel() != course.getLevel()) {
+        if (!student.getLevel().equals(course.getLevel())) {
             throw new BusinessException("This student does not follow this module");
         }
         if (request.score().compareTo(request.maxScore()) > 0) {

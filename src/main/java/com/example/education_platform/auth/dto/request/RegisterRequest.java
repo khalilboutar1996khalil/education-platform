@@ -1,5 +1,6 @@
 package com.example.education_platform.auth.dto.request;
 
+import com.example.education_platform.level.validation.KnownLevel;
 import com.example.education_platform.user.entity.Level;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -22,5 +23,6 @@ public record RegisterRequest(
         String password,
 
         @NotNull(message = "{user.level.required}")
+        @KnownLevel
         Level level) {
 }

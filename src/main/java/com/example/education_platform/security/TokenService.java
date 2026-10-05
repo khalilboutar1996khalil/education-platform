@@ -35,7 +35,7 @@ public class TokenService {
                 .claim("email", user.getEmail())
                 .claim(ROLE_CLAIM, user.getRole().name());
         if (user.getLevel() != null) {
-            claims.claim("level", user.getLevel().name());
+            claims.claim("level", user.getLevel().code());
         }
         JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).build();
         String value = encoder.encode(JwtEncoderParameters.from(header, claims.build())).getTokenValue();

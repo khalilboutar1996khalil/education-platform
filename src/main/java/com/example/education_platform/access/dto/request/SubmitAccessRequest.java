@@ -1,5 +1,6 @@
 package com.example.education_platform.access.dto.request;
 
+import com.example.education_platform.level.validation.KnownLevel;
 import com.example.education_platform.user.entity.Level;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -18,6 +19,7 @@ public record SubmitAccessRequest(
         String email,
 
         @NotNull(message = "{user.level.required}")
+        @KnownLevel
         Level level,
 
         @Size(max = 1000)

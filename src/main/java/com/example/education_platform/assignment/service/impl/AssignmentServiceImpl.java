@@ -162,7 +162,7 @@ public class AssignmentServiceImpl implements AssignmentService {
         if (me.isAdmin()) {
             return assignment;
         }
-        if (assignment.getCourse().getLevel() != me.getLevel()) {
+        if (!assignment.getCourse().getLevel().equals(me.getLevel())) {
             throw new AccessDeniedException("This assignment belongs to another level");
         }
         if (!VISIBLE_TO_STUDENTS.contains(assignment.getStatus())) {
