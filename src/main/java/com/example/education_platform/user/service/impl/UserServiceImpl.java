@@ -108,6 +108,8 @@ public class UserServiceImpl implements UserService {
         user.setPasswordHash(passwordEncoder.encode(temporaryPassword));
         // Whoever held the old password may still be signed in somewhere
         refreshTokens.revokeAllForUser(user.getId(), Instant.now());
+        // Still returned as well, as for an invitation: without SMTP configured the mail goes nowhere
+        emailService.sendTemporaryPassword(user.getEmail(), user.getFullName(), temporaryPassword);
         return new PasswordResetResponse(userMapper.toResponse(user), temporaryPassword);
     }
 

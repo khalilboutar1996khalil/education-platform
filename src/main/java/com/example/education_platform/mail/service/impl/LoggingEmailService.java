@@ -1,6 +1,7 @@
 package com.example.education_platform.mail.service.impl;
 
 import com.example.education_platform.mail.service.EmailService;
+import java.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -26,5 +27,20 @@ public class LoggingEmailService implements EmailService {
     @Override
     public void sendPasswordReset(String to, String fullName, String resetToken) {
         LOG.info("[no SMTP configured] password reset for {} would be sent to {}", fullName, to);
+    }
+
+    @Override
+    public void sendAccessRejected(String to, String fullName, String note) {
+        LOG.info("[no SMTP configured] access refusal for {} would be sent to {}", fullName, to);
+    }
+
+    @Override
+    public void sendTemporaryPassword(String to, String fullName, String temporaryPassword) {
+        LOG.info("[no SMTP configured] temporary password for {} would be sent to {}", fullName, to);
+    }
+
+    @Override
+    public void sendDeadlineReminder(String to, String fullName, String title, Instant deadline, String path) {
+        LOG.info("[no SMTP configured] reminder for \"{}\" would be sent to {}", title, to);
     }
 }

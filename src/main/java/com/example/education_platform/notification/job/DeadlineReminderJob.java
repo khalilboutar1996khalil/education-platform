@@ -4,6 +4,7 @@ import com.example.education_platform.assignment.entity.Assignment;
 import com.example.education_platform.assignment.entity.AssignmentStatus;
 import com.example.education_platform.assignment.repository.AssignmentRepository;
 import com.example.education_platform.assignment.repository.SubmissionRepository;
+import com.example.education_platform.mail.service.EmailService;
 import com.example.education_platform.notification.entity.NotificationType;
 import com.example.education_platform.notification.service.NotificationService;
 import com.example.education_platform.user.entity.Role;
@@ -41,6 +42,7 @@ public class DeadlineReminderJob {
     private final SubmissionRepository submissions;
     private final UserRepository users;
     private final NotificationService notificationService;
+    private final EmailService emailService;
 
     @Scheduled(cron = "0 0 * * * *")
     @Transactional
@@ -70,8 +72,19 @@ public class DeadlineReminderJob {
                     "À rendre demain : " + assignment.getTitle(),
                     "Le TP « " + assignment.getTitle() + " » est à rendre dans 24 heures.",
                     "/assignments/" + assignment.getId());
+            pending.forEach(student -> email(student, assignment));
             reminded += pending.size();
         }
         return reminded;
+    }
+
+    /** One address that bounces must not cost everybody else their reminder. */
+    private void email(User student, Assignment assignment) {
+        try {
+            emailService.sendDeadlineReminder(student.getEmail(), student.getFullName(),
+                    assignment.getTitle(), assignment.getDeadline(), "/app/assignments");
+        } catch (RuntimeException e) {
+            LOG.warn("Deadline reminder e-mail to {} failed: {}", student.getEmail(), e.getMessage());
+        }
     }
 }
