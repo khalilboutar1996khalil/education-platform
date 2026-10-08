@@ -4,17 +4,17 @@ import com.example.education_platform.mail.service.EmailService;
 import java.time.Instant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
 
 /**
- * What runs when no SMTP host is configured: development, and tests.
+ * What runs when neither an SMTP host nor a Brevo API key is configured: development, and tests.
  *
  * <p>It logs that a mail would have gone out and to whom, but never the temporary password or the
  * reset token — a log file is not a place to put either.
  */
 @Service
-@ConditionalOnMissingBean(name = "smtpEmailService")
+@ConditionalOnExpression("'${spring.mail.host:}'.isBlank() and '${BREVO_API_KEY:}'.isBlank()")
 public class LoggingEmailService implements EmailService {
 
     private static final Logger LOG = LoggerFactory.getLogger(LoggingEmailService.class);

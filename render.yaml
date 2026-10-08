@@ -1,0 +1,40 @@
+# Render Blueprint for the EduFlow API (free plan).
+# Render → New → Blueprint → choose this repository. Secrets marked "sync: false"
+# are asked for in the dashboard and never stored in Git.
+services:
+  - type: web
+    name: eduflow-api
+    runtime: docker
+    plan: free
+    region: frankfurt          # same region as the Neon database
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      # Neon: jdbc:postgresql://<host>/<database>?sslmode=require
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      # The Vercel address of the Angular site, e.g. https://eduflow.vercel.app
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      # E-mail through Brevo's HTTPS API (Render's free plan blocks SMTP)
+      - key: BREVO_API_KEY
+        sync: false
+      - key: APP_MAIL_FROM
+        sync: false
+      # First administrator, created on the first start only
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: JAVA_OPTS
+        value: -XX:MaxRAMPercentage=70
