@@ -12,6 +12,7 @@ import com.example.education_platform.common.PageResponse;
 import com.example.education_platform.common.exception.BusinessException;
 import com.example.education_platform.common.exception.ResourceNotFoundException;
 import com.example.education_platform.security.CurrentUser;
+import com.example.education_platform.mail.service.EmailService;
 import com.example.education_platform.user.dto.request.InviteStudentRequest;
 import com.example.education_platform.user.dto.response.InviteStudentResponse;
 import com.example.education_platform.user.repository.UserRepository;
@@ -37,6 +38,7 @@ public class AccessRequestServiceImpl implements AccessRequestService {
     private final AccessRequestRepository requests;
     private final UserRepository users;
     private final UserService userService;
+    private final EmailService emailService;
     private final AccessRequestMapper requestMapper;
     private final CurrentUser currentUser;
 
@@ -90,6 +92,8 @@ public class AccessRequestServiceImpl implements AccessRequestService {
     public AccessRequestResponse reject(Long id, String note) {
         AccessRequest request = pending(id);
         request.reject(currentUser.get(), note, Instant.now());
+        // Without this the person waits on an answer that already came
+        emailService.sendAccessRejected(request.getEmail(), request.getFullName(), note);
         return requestMapper.toResponse(request);
     }
 
