@@ -40,7 +40,8 @@ logging:
     console: "%d{HH:mm:ss.SSS} %-5level [%X{requestId:-no-request}] %logger{32} - %msg%n"
 
 server:
-  port: ${SERVER_PORT:8080}
+  # Render (and most hosts) give the port in PORT; SERVER_PORT still works locally
+  port: ${PORT:${SERVER_PORT:8080}}
 
 management:
   endpoints:
@@ -63,6 +64,12 @@ springdoc:
     path: /swagger-ui.html
 
 app:
+  mail:
+    # Sender address. With Brevo it must be a sender verified in the Brevo account.
+    from: ${APP_MAIL_FROM:no-reply@eduflow.dz}
+    from-name: ${APP_MAIL_FROM_NAME:EduFlow}
+    # Address of the Angular site, used to build the links inside e-mails (reset password…)
+    base-url: ${FRONTEND_URL:http://localhost:5173}
   bootstrap:
     # First admin of an empty database (production). Ignored as soon as any admin exists.
     admin:
