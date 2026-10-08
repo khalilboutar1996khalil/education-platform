@@ -89,9 +89,25 @@ CORS_ALLOWED_ORIGINS=http://localhost:4200
 
 Puis `./gradlew bootRun`.
 
-## Fichiers déposés
+## Fichiers déposés — Cloudflare R2
 
-Le stockage actuel écrit sur le disque du serveur. Sur Render gratuit, ce disque est effacé à chaque
-redémarrage : les PDF et devoirs déposés disparaissent (les lignes en base restent, mais pointent
-vers des fichiers absents). Pour un usage réel, il faut un stockage objet compatible S3
-(Cloudflare R2 gratuit jusqu'à 10 Go, ou le stockage objet de Neon), ou un disque persistant Render (payant).
+Sur Render gratuit, le disque est effacé à chaque redéploiement : les PDF et devoirs déposés y
+disparaîtraient. Dès que `STORAGE_S3_BUCKET` est renseigné, l'API range les fichiers dans un bucket
+compatible S3 (Cloudflare R2, gratuit jusqu'à 10 Go) ; sinon elle écrit sur le disque, comme en local.
+
+1. dash.cloudflare.com → **R2 Object Storage** → **Create bucket** : `eduflow-uploads`, emplacement
+   automatique. Le bucket reste **privé** : les téléchargements passent par l'API, qui vérifie les droits.
+2. **R2 → Manage API tokens → Create API token** : permission **Object Read & Write**, limitée au
+   bucket `eduflow-uploads`. Noter l'**Access Key ID** et le **Secret Access Key** (affiché une seule fois).
+3. L'**endpoint** est `https://<account-id>.r2.cloudflarestorage.com` (affiché sur la page du bucket).
+4. Render → `eduflow-api` → **Environment** :
+
+| Variable                | Valeur                                              |
+|-------------------------|-----------------------------------------------------|
+| `STORAGE_S3_ENDPOINT`   | `https://<account-id>.r2.cloudflarestorage.com`     |
+| `STORAGE_S3_BUCKET`     | `eduflow-uploads`                                   |
+| `STORAGE_S3_ACCESS_KEY` | l'Access Key ID                                     |
+| `STORAGE_S3_SECRET_KEY` | le Secret Access Key                                |
+
+Les fichiers déposés avant ce réglage étaient sur le disque de Render : ils sont déjà perdus et
+doivent être redéposés.

@@ -36,5 +36,14 @@ services:
         sync: false
       - key: ADMIN_PASSWORD
         sync: false
+      # Uploaded files (PDF, images…) in Cloudflare R2: the free plan's disk is wiped on every deploy
+      - key: STORAGE_S3_ENDPOINT
+        sync: false
+      - key: STORAGE_S3_BUCKET
+        sync: false
+      - key: STORAGE_S3_ACCESS_KEY
+        sync: false
+      - key: STORAGE_S3_SECRET_KEY
+        sync: false
       - key: JAVA_OPTS
         value: -XX:MaxRAMPercentage=70

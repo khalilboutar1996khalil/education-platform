@@ -23,6 +23,7 @@ ext {
     mapstructVersion = '1.6.3'
     lombokMapstructBindingVersion = '0.2.0'
     springdocVersion = '3.1.1'
+    awsSdkVersion = '2.55.13'
 }
 
 dependencies {
@@ -40,6 +41,10 @@ dependencies {
     runtimeOnly 'org.postgresql:postgresql'
 
     implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // Uploads in Cloudflare R2 (S3 API) in production; only the S3 client, not the whole SDK
+    implementation platform("software.amazon.awssdk:bom:${awsSdkVersion}")
+    implementation 'software.amazon.awssdk:s3'
 
     // Dashboard caching: Caffeine gives the TTL that the plain in-memory manager lacks
     implementation 'org.springframework.boot:spring-boot-starter-cache'
