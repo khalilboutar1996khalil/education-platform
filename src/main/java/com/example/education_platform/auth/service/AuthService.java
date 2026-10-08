@@ -10,7 +10,7 @@ public interface AuthService {
     LoginResponse login(LoginRequest request, String userAgent, String ipAddress);
 
     /**
-     * Creates an active student account from a valid class code and signs them in straight away:
+     * Creates an active student account at the level they picked and signs them in straight away:
      * there is no approval step and no email, so the tokens come back with this same call.
      */
     LoginResponse register(RegisterRequest request, String userAgent, String ipAddress);
