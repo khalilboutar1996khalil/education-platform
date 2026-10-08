@@ -71,6 +71,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_GET).permitAll()
+                        // The registration form lists the levels before anyone is signed in
+                        .requestMatchers(HttpMethod.GET, "/api/v1/levels").permitAll()
                         .requestMatchers(HttpMethod.POST, PUBLIC_AUTH_POST).permitAll()
                         .requestMatchers(HttpMethod.POST, PUBLIC_POST).permitAll()
                         .anyRequest().authenticated())

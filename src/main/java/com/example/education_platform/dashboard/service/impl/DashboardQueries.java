@@ -17,6 +17,7 @@ import com.example.education_platform.dashboard.dto.response.StudentDashboardRes
 import com.example.education_platform.grade.service.GradebookService;
 import com.example.education_platform.notification.repository.NotificationRepository;
 import com.example.education_platform.quiz.entity.Quiz;
+import com.example.education_platform.level.repository.SchoolLevelRepository;
 import com.example.education_platform.quiz.entity.QuizStatus;
 import com.example.education_platform.quiz.repository.QuizRepository;
 import com.example.education_platform.user.entity.Level;
@@ -63,6 +64,7 @@ public class DashboardQueries {
     private final SubmissionRepository submissions;
     private final QuizRepository quizzes;
     private final NotificationRepository notifications;
+    private final SchoolLevelRepository schoolLevels;
     private final GradebookService gradebook;
 
     @Cacheable(cacheNames = CacheConfig.DASHBOARD_CACHE, key = "'admin:' + #adminId")
@@ -81,9 +83,11 @@ public class DashboardQueries {
                 perLevel(courses::countByLevel));
     }
 
-    private static List<LevelCountResponse> perLevel(java.util.function.ToLongFunction<Level> counter) {
-        return java.util.Arrays.stream(Level.values())
-                .map(level -> new LevelCountResponse(level, counter.applyAsLong(level)))
+    /** Every active level, in display order, with a zero when nothing is attached to it yet. */
+    private List<LevelCountResponse> perLevel(java.util.function.ToLongFunction<Level> counter) {
+        return schoolLevels.findByActiveTrueOrderByPositionAscCodeAsc().stream()
+                .map(level -> new LevelCountResponse(
+                        level.level(), level.getName(), counter.applyAsLong(level.level())))
                 .toList();
     }
 

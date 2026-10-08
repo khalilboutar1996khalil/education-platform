@@ -6,8 +6,6 @@ import com.example.education_platform.user.entity.Level;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
@@ -34,7 +32,6 @@ public class Course extends BaseEntity {
     @Column(length = 2000)
     private String description;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private Level level;
 

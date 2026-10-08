@@ -1,5 +1,6 @@
 package com.example.education_platform.course.dto.request;
 
+import com.example.education_platform.level.validation.KnownLevel;
 import com.example.education_platform.user.entity.Level;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -20,6 +21,7 @@ public record CourseRequest(
         String description,
 
         @NotNull(message = "{course.level.required}")
+        @KnownLevel
         Level level,
 
         @Pattern(regexp = "#[0-9A-Fa-f]{6}", message = "{course.color.invalid}")

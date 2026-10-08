@@ -1,5 +1,6 @@
 package com.example.education_platform.classcode.dto.request;
 
+import com.example.education_platform.level.validation.KnownLevel;
 import com.example.education_platform.user.entity.Level;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -14,6 +15,7 @@ public record CreateClassCodeRequest(
         String code,
 
         @NotNull(message = "{classCode.level.required}")
+        @KnownLevel
         Level level,
 
         @Size(max = 255)

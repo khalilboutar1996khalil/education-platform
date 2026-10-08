@@ -133,7 +133,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     private static void requireVisible(User me, Course course) {
-        if (!me.isAdmin() && course.getLevel() != me.getLevel()) {
+        if (!me.isAdmin() && !course.getLevel().equals(me.getLevel())) {
             throw new AccessDeniedException("This module belongs to another level");
         }
     }

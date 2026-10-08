@@ -189,7 +189,7 @@ public class SubmissionServiceImpl implements SubmissionService {
     private Assignment openAssignment(Long assignmentId, User student) {
         Assignment assignment = assignments.findDetailById(assignmentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Assignment", assignmentId));
-        if (assignment.getCourse().getLevel() != student.getLevel()) {
+        if (!assignment.getCourse().getLevel().equals(student.getLevel())) {
             throw new AccessDeniedException("This assignment belongs to another level");
         }
         if (!assignment.acceptsSubmissionsAt(Instant.now())) {
@@ -230,7 +230,7 @@ public class SubmissionServiceImpl implements SubmissionService {
 
         User partner = users.findById(partnerId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", partnerId));
-        if (partner.isAdmin() || partner.getLevel() != student.getLevel()) {
+        if (partner.isAdmin() || !partner.getLevel().equals(student.getLevel())) {
             throw new BusinessException("The partner must be a student of the same level");
         }
         // Otherwise one student could end up inside two submissions for the same assignment

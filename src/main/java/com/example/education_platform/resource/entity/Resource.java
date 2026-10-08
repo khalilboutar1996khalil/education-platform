@@ -45,7 +45,6 @@ public class Resource extends BaseEntity {
     private Course course;
 
     /** Null means every level. */
-    @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private Level level;
 
@@ -80,8 +79,8 @@ public class Resource extends BaseEntity {
         if (studentLevel == null) {
             return true;
         }
-        boolean courseAllows = course == null || course.getLevel() == studentLevel;
-        boolean levelAllows = level == null || level == studentLevel;
+        boolean courseAllows = course == null || course.getLevel().equals(studentLevel);
+        boolean levelAllows = level == null || level.equals(studentLevel);
         return courseAllows && levelAllows;
     }
 }

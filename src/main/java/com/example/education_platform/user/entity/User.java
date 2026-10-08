@@ -37,7 +37,6 @@ public class User extends BaseEntity {
     private Role role;
 
     /** Only set for students; admins see every level. */
-    @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private Level level;
 

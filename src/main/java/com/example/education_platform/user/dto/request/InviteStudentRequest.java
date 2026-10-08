@@ -1,5 +1,6 @@
 package com.example.education_platform.user.dto.request;
 
+import com.example.education_platform.level.validation.KnownLevel;
 import com.example.education_platform.user.entity.Level;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -17,5 +18,6 @@ public record InviteStudentRequest(
         String email,
 
         @NotNull(message = "{user.level.required}")
+        @KnownLevel
         Level level) {
 }

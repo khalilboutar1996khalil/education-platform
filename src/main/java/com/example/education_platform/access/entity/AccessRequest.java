@@ -37,7 +37,6 @@ public class AccessRequest extends BaseEntity {
     @Column(nullable = false)
     private String email;
 
-    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private Level level;
 

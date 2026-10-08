@@ -1,6 +1,7 @@
 package com.example.education_platform.resource.dto.request;
 
 import com.example.education_platform.resource.entity.ResourceType;
+import com.example.education_platform.level.validation.KnownLevel;
 import com.example.education_platform.user.entity.Level;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -24,6 +25,7 @@ public record ResourceRequest(
 
         Long courseId,
 
+        @KnownLevel
         Level level,
 
         @Size(max = 1000)
