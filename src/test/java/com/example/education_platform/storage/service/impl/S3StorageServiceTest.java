@@ -99,7 +99,8 @@ class S3StorageServiceTest {
     void loadStreamsTheObjectOnlyWhenRead() throws IOException {
         StoredFile file = new StoredFile("cours.pdf", "application/pdf", CONTENT.length, "abc.pdf", "x", null);
         when(s3.getObject(any(Consumer.class))).thenReturn(new ResponseInputStream<>(
-                GetObjectResponse.builder().build(), AbortableInputStream.create(new java.io.ByteArrayInputStream(CONTENT))));
+                GetObjectResponse.builder().build(),
+                AbortableInputStream.create(new java.io.ByteArrayInputStream(CONTENT))));
 
         Resource resource = storage.loadAsResource(file);
         verify(s3, never()).getObject(any(Consumer.class));
