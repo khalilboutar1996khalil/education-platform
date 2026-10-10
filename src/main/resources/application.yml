@@ -87,6 +87,8 @@ app:
       max-failures: 5     # consecutive failures tolerated per email address
       lockout: 15m
   storage:
+    # Local disk unless a bucket is set. Render's free disk is wiped on every deploy, so production
+    # sets the STORAGE_S3_* variables (Cloudflare R2).
     location: ${STORAGE_LOCATION:./var/uploads}
     max-file-size: 500MB
     # An allow-list, never a deny-list: anything unlisted is refused
@@ -99,5 +101,11 @@ app:
       - text/plain
       - application/msword
       - application/vnd.openxmlformats-officedocument.wordprocessingml.document
+    s3:
+      endpoint: ${STORAGE_S3_ENDPOINT:}
+      region: ${STORAGE_S3_REGION:auto}
+      bucket: ${STORAGE_S3_BUCKET:}
+      access-key: ${STORAGE_S3_ACCESS_KEY:}
+      secret-key: ${STORAGE_S3_SECRET_KEY:}
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}

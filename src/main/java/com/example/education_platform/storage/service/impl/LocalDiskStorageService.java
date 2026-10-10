@@ -16,11 +16,10 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
-import java.util.Locale;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.core.io.PathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -28,7 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * Writes uploads under a configured root.
+ * Writes uploads under a configured root. Used whenever no object store is configured (local
+ * development, tests).
  *
  * <p>The client's filename never reaches the filesystem: the path is built from a generated UUID,
  * which makes traversal impossible by construction rather than by escaping. The original name is
@@ -36,11 +36,8 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Service
 @RequiredArgsConstructor
+@ConditionalOnExpression("'${app.storage.s3.bucket:}'.isBlank()")
 public class LocalDiskStorageService implements StorageService {
-
-    private static final int MAX_FILENAME_LENGTH = 255;
-    private static final int MAX_EXTENSION_LENGTH = 10;
-    private static final String FALLBACK_FILENAME = "fichier";
 
     private final StorageProperties properties;
     private final StoredFileRepository storedFiles;
@@ -61,20 +58,19 @@ public class LocalDiskStorageService implements StorageService {
     @Override
     @Transactional
     public StoredFile store(MultipartFile file) {
-        validate(file);
+        UploadRules.validate(file, properties);
 
-        String originalFilename = sanitize(file.getOriginalFilename());
-        String storageKey = UUID.randomUUID() + extensionOf(originalFilename);
+        String originalFilename = UploadRules.sanitize(file.getOriginalFilename());
+        String storageKey = UUID.randomUUID() + UploadRules.extensionOf(originalFilename);
         Path target = resolve(storageKey);
 
-        MessageDigest digest = sha256();
+        MessageDigest digest = UploadRules.sha256();
         long written = write(file, target, digest);
 
         // The declared size can lie; this is the byte count actually written
         if (written > properties.maxFileSize().toBytes()) {
             deleteQuietly(target);
-            throw new BusinessException("The file exceeds the maximum size of "
-                    + properties.maxFileSize().toMegabytes() + " MB");
+            throw UploadRules.tooLarge(properties);
         }
 
         StoredFile stored = new StoredFile(originalFilename, file.getContentType(), written,
@@ -94,22 +90,6 @@ public class LocalDiskStorageService implements StorageService {
     @Override
     public void delete(StoredFile file) {
         deleteQuietly(resolve(file.getStorageKey()));
-    }
-
-    // ---------- validation ----------
-
-    private void validate(MultipartFile file) {
-        if (file == null || file.isEmpty()) {
-            throw new BusinessException("The file is empty");
-        }
-        if (file.getSize() > properties.maxFileSize().toBytes()) {
-            throw new BusinessException("The file exceeds the maximum size of "
-                    + properties.maxFileSize().toMegabytes() + " MB");
-        }
-        String contentType = file.getContentType();
-        if (contentType == null || !properties.allowedContentTypes().contains(contentType.toLowerCase(Locale.ROOT))) {
-            throw new BusinessException("Files of type " + contentType + " are not accepted");
-        }
     }
 
     // ---------- paths ----------
@@ -149,41 +129,4 @@ public class LocalDiskStorageService implements StorageService {
         }
     }
 
-    // ---------- names ----------
-
-    /** Keeps the leaf name only, so "../../etc/passwd" survives as "passwd" and nothing more. */
-    private static String sanitize(String originalFilename) {
-        if (originalFilename == null || originalFilename.isBlank()) {
-            return FALLBACK_FILENAME;
-        }
-        String name = originalFilename.replace('\\', '/');
-        name = name.substring(name.lastIndexOf('/') + 1)
-                .replaceAll("\\p{Cntrl}", "")
-                .trim();
-        if (name.isBlank() || ".".equals(name) || "..".equals(name)) {
-            return FALLBACK_FILENAME;
-        }
-        return name.length() > MAX_FILENAME_LENGTH ? name.substring(0, MAX_FILENAME_LENGTH) : name;
-    }
-
-    private static String extensionOf(String filename) {
-        int dot = filename.lastIndexOf('.');
-        if (dot < 0 || dot == filename.length() - 1) {
-            return "";
-        }
-        String extension = filename.substring(dot + 1).replaceAll("[^A-Za-z0-9]", "");
-        if (extension.isEmpty()) {
-            return "";
-        }
-        return "." + extension.substring(0, Math.min(extension.length(), MAX_EXTENSION_LENGTH))
-                .toLowerCase(Locale.ROOT);
-    }
-
-    private static MessageDigest sha256() {
-        try {
-            return MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("SHA-256 is required by every JVM", e);
-        }
-    }
 }
