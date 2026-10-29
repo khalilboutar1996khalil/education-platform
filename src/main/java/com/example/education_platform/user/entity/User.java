@@ -26,8 +26,16 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String fullName;
 
-    @Column(nullable = false, unique = true)
+    /** Null for a student who joined through a book coupon without giving one. */
+    @Column(unique = true)
     private String email;
+
+    /**
+     * Sign-in name for students who joined through a book coupon, e.g. {@code amina.bensalem}.
+     * Every account has an email, a username, or both.
+     */
+    @Column(unique = true, length = 60)
+    private String username;
 
     @Column(nullable = false)
     private String passwordHash;

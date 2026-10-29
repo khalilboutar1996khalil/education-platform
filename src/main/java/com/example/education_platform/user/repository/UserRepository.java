@@ -18,6 +18,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByEmail(String email);
 
+    Optional<User> findByUsername(String username);
+
+    boolean existsByUsername(String username);
+
     /** Whether the platform already has someone able to administer it. */
     boolean existsByRole(Role role);
 
@@ -52,7 +56,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
               and (:status is null or u.status = :status)
               and (:search is null
                    or lower(u.fullName) like :search
-                   or lower(u.email) like :search)
+                   or lower(u.email) like :search
+                   or lower(u.username) like :search)
             """)
     Page<User> search(@Param("role") Role role,
                       @Param("level") Level level,

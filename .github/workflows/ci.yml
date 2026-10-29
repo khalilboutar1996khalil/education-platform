@@ -63,11 +63,33 @@ jobs:
       - name: Build, check and test
         # Runs exactly what runs locally: compile, Checkstyle (maxWarnings=0), 272 tests,
         # JaCoCo and the 70% coverage gate.
-        run: ./gradlew build --no-daemon
+        shell: bash
+        run: |
+          set -o pipefail
+          ./gradlew build --no-daemon 2>&1 | tee build.log
         env:
           TEST_DB_URL: jdbc:postgresql://localhost:5432/eduflow_test
           TEST_DB_USERNAME: eduflow
           TEST_DB_PASSWORD: eduflow
+
+      - name: Point at what failed
+        # Turns the reason into annotations, shown on the pull request without opening the log
+        if: failure()
+        shell: bash
+        run: |
+          for f in build/test-results/test/*.xml; do
+            [ -f "$f" ] || continue
+            python3 - "$f" <<'PY'
+          import sys, xml.etree.ElementTree as ET
+          for case in ET.parse(sys.argv[1]).getroot().iter("testcase"):
+              for problem in list(case.findall("failure")) + list(case.findall("error")):
+                  message = (problem.get("message") or problem.text or "").strip().splitlines()
+                  first = message[0][:300] if message else ""
+                  print(f"::error::{case.get('classname')}.{case.get('name')}: {first}")
+          PY
+          done
+          grep -E "error:|warning:|FAILED|What went wrong|\[ant:checkstyle\]|Rule violated|lines covered" build.log \
+            | head -5 | while IFS= read -r line; do echo "::error::${line}"; done
 
       - name: Publish the test report
         # Runs even when tests fail, which is exactly when the report is worth having

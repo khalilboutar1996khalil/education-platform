@@ -84,6 +84,25 @@ class UserRepositoryTest {
     }
 
     @Test
+    void rejectsAnAccountWithNeitherEmailNorUsername() {
+        User nobody = new User("Sans Identifiant", null, "hash", Role.STUDENT, Level.THIRD_AS);
+
+        assertThatThrownBy(() -> repository.saveAndFlush(nobody))
+                .describedAs("nobody could ever sign in to it")
+                .isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    void acceptsAStudentKnownOnlyByAUsername() {
+        User student = new User("Amina Bensalem", null, "hash", Role.STUDENT, Level.SEVENTH_BASE);
+        student.setUsername("amina.bensalem");
+
+        repository.saveAndFlush(student);
+
+        assertThat(repository.findByUsername("amina.bensalem")).isPresent();
+    }
+
+    @Test
     void rejectsAStudentWithoutALevel() {
         User noLevel = new User("Sans Niveau", "nolevel@eduflow.dz", "hash", Role.STUDENT, null);
 

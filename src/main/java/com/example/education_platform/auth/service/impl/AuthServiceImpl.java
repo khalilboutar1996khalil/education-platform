@@ -59,7 +59,8 @@ public class AuthServiceImpl implements AuthService {
         String email = normalise(request.email());
         rateLimiter.checkAllowed(email);
 
-        Optional<User> found = users.findByEmail(email)
+        // An "@" means an email address; anything else is the username of a book-coupon student
+        Optional<User> found = (email.contains("@") ? users.findByEmail(email) : users.findByUsername(email))
                 .filter(candidate -> passwordEncoder.matches(request.password(), candidate.getPasswordHash()))
                 .filter(candidate -> candidate.getStatus() != UserStatus.DISABLED);
         if (found.isEmpty()) {
@@ -70,6 +71,12 @@ public class AuthServiceImpl implements AuthService {
 
         User user = found.get();
         rateLimiter.recordSuccess(email);
+        return startSession(user, userAgent, ipAddress);
+    }
+
+    @Override
+    @Transactional
+    public LoginResponse startSession(User user, String userAgent, String ipAddress) {
         return new LoginResponse(issueTokens(user, userAgent, ipAddress), userMapper.toResponse(user));
     }
 

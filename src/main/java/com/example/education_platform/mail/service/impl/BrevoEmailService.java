@@ -34,7 +34,7 @@ public class BrevoEmailService extends TextEmailService {
     }
 
     @Override
-    protected void send(String to, String subject, String body) {
+    protected void deliver(String to, String subject, String body) {
         Map<String, Object> payload = Map.of(
                 "sender", Map.of("name", fromName, "email", from),
                 "to", List.of(Map.of("email", to)),

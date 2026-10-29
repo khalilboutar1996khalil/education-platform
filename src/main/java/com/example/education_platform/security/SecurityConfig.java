@@ -50,7 +50,9 @@ public class SecurityConfig {
 
     /** Asking for access is by definition something a person without an account has to do. */
     private static final String[] PUBLIC_POST = {
-        "/api/v1/access-requests"
+        "/api/v1/access-requests",
+        // Activating a book creates the account, so the student cannot be signed in yet
+        "/api/v1/coupons/redeem"
     };
 
     private static final String[] PUBLIC_AUTH_POST = {

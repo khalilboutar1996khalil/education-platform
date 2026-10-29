@@ -4,10 +4,15 @@ import com.example.education_platform.auth.dto.request.LoginRequest;
 import com.example.education_platform.auth.dto.request.RegisterRequest;
 import com.example.education_platform.auth.dto.response.LoginResponse;
 import com.example.education_platform.auth.dto.response.TokenResponse;
+import com.example.education_platform.user.entity.User;
 
 public interface AuthService {
 
+    /** {@code request.email()} may also be a username, for students who joined through a book coupon. */
     LoginResponse login(LoginRequest request, String userAgent, String ipAddress);
+
+    /** Signs in an account that was just created by another flow, e.g. redeeming a book coupon. */
+    LoginResponse startSession(User user, String userAgent, String ipAddress);
 
     /**
      * Creates an active student account at the level they picked and signs them in straight away:
