@@ -29,9 +29,11 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-// The test profile all but disables throttling; this class checks it, so it restores a real limit
+// The test profile all but disables throttling; this class checks it, so it restores a real limit.
+// Same values as LoginRateLimitIntegrationTest on purpose: both share one Spring context (and its
+// database connections) instead of starting another.
 @TestPropertySource(properties = {
-        "app.security.login.max-failures=5",
+        "app.security.login.max-failures=3",
         "app.security.login.lockout=15m"
 })
 class CouponApiIntegrationTest {
@@ -184,7 +186,7 @@ class CouponApiIntegrationTest {
     @Test
     void guessingTheCodeOfOneBookIsThrottled() {
         Coupon coupon = firstCouponOf("SEVENTH_BASE");
-        for (int attempt = 0; attempt < 5; attempt++) {
+        for (int attempt = 0; attempt < 3; attempt++) {
             redeem(coupon.getSerial(), "AAAAAAAA", "Amina", "Bensalem");
         }
 
