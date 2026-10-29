@@ -21,7 +21,8 @@ public class AssignmentDeadlineJob {
 
     private final AssignmentRepository assignments;
 
-    @Scheduled(fixedDelayString = "PT5M", initialDelayString = "PT2M")
+    /** Same schedule as the quiz deadline job: see {@code app.jobs.deadline-cron}. */
+    @Scheduled(cron = "${app.jobs.deadline-cron:0 */5 * * * *}")
     @Transactional
     public void run() {
         int closed = closeOverdue(Instant.now());

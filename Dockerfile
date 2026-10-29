@@ -45,6 +45,6 @@ ENV SPRING_PROFILES_ACTIVE=prod \
 
 # Actuator already reports the database, so this checks the app end to end rather than just the port
 HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
-    CMD ["sh", "-c", "wget -q -O- http://localhost:8080/actuator/health | grep -q '\"status\":\"UP\"'"]
+    CMD ["sh", "-c", "wget -q -O- http://localhost:8080/actuator/health/liveness | grep -q '\"status\":\"UP\"'"]
 
 ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar app.jar"]
