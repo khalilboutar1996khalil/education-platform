@@ -9,10 +9,22 @@ spring:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
 
+  datasource:
+    hikari:
+      # Neon bills compute for every hour the database is awake, and an open connection keeps it
+      # awake. Release idle connections quickly so it can sleep between requests.
+      minimum-idle: 0
+      idle-timeout: 30s
+      maximum-pool-size: 5
+
 management:
   endpoint:
     health:
       show-details: never
+      # /actuator/health/liveness answers without touching the database: that is the URL for
+      # Render's health check and for an uptime pinger, which would otherwise keep Neon awake.
+      probes:
+        enabled: true
 
 springdoc:
   api-docs:
@@ -28,3 +40,8 @@ logging:
       console: ecs
   level:
     root: INFO
+
+app:
+  jobs:
+    # Hourly, on the hour, like the deadline reminder: one database wake-up an hour, not twelve
+    deadline-cron: "0 0 * * * *"

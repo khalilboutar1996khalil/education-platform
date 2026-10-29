@@ -29,8 +29,11 @@ public class QuizDeadlineJob {
     private final QuizRepository quizzes;
     private final QuizAttemptRepository attempts;
 
-    /** Every five minutes: fine grained enough for a deadline, cheap enough to ignore. */
-    @Scheduled(fixedDelayString = "PT5M", initialDelayString = "PT1M")
+    /**
+     * Every five minutes by default. Production runs it hourly, together with the other jobs, so a
+     * database that bills by the hour it is awake (Neon) wakes once an hour rather than all day.
+     */
+    @Scheduled(cron = "${app.jobs.deadline-cron:0 */5 * * * *}")
     @Transactional
     public void run() {
         Instant now = Instant.now();

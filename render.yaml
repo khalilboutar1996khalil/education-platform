@@ -8,7 +8,8 @@ services:
     plan: free
     region: frankfurt          # same region as the Neon database
     dockerfilePath: ./Dockerfile
-    healthCheckPath: /actuator/health
+    # Liveness does not query the database, so health checks do not keep Neon awake
+    healthCheckPath: /actuator/health/liveness
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
