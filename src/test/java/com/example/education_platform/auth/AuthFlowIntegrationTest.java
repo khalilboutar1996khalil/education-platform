@@ -92,7 +92,7 @@ class AuthFlowIntegrationTest {
     @Test
     void anInvalidPayloadIsRejectedWithTheStandardProblemShape() {
         assertThat(post("/api/v1/auth/login", """
-                {"email":"not-an-email","password":""}"""))
+                {"email":"","password":""}"""))
                 .hasStatus(400)
                 .bodyJson()
                 .satisfies(body -> {

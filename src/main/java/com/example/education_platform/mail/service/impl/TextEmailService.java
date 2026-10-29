@@ -26,8 +26,19 @@ public abstract class TextEmailService implements EmailService {
     @Value("${app.mail.time-zone:Africa/Algiers}")
     private ZoneId timeZone;
 
-    /** Sends one plain-text message. */
-    protected abstract void send(String to, String subject, String body);
+    private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(TextEmailService.class);
+
+    /** Sends one plain-text message to an address that is known to exist. */
+    protected abstract void deliver(String to, String subject, String body);
+
+    /** A student who joined through a book coupon may have no address: there is nobody to write to. */
+    private void send(String to, String subject, String body) {
+        if (to == null || to.isBlank()) {
+            LOG.info("E-mail \"{}\" not sent: the account has no email address", subject);
+            return;
+        }
+        deliver(to, subject, body);
+    }
 
     @Override
     public void sendInvitation(String to, String fullName, String temporaryPassword) {

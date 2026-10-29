@@ -19,7 +19,7 @@ public class SmtpEmailService extends TextEmailService {
     private final JavaMailSender mailSender;
 
     @Override
-    protected void send(String to, String subject, String body) {
+    protected void deliver(String to, String subject, String body) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(from);
         message.setTo(to);

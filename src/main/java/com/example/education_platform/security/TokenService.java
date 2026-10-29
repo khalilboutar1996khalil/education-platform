@@ -32,8 +32,11 @@ public class TokenService {
                 // Without a unique id, two tokens issued in the same second are byte-identical,
                 // so a refresh would hand the client back the token it already had.
                 .id(UUID.randomUUID().toString())
-                .claim("email", user.getEmail())
                 .claim(ROLE_CLAIM, user.getRole().name());
+        // A student who joined through a book coupon may have no email address
+        if (user.getEmail() != null) {
+            claims.claim("email", user.getEmail());
+        }
         if (user.getLevel() != null) {
             claims.claim("level", user.getLevel().code());
         }
