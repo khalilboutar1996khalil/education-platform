@@ -1,15 +1,23 @@
 # Local development on your machine (Homebrew PostgreSQL).
 
+
 spring:
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/eduflow}
-    username: ${DB_USERNAME:eduflow}
-    password: ${DB_PASSWORD:eduflow}
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    hikari:
+      idle-timeout: 30000
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 30000
+      max-lifetime: 1800000
 
 management:
   endpoint:
     health:
-      show-details: always       # shows database status on /actuator/health
+      show-details: never
+      # shows database status on /actuator/health
 
 app:
   jwt:

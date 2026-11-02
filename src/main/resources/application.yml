@@ -1,48 +1,45 @@
-# Shared settings for every profile. Profile files (application-<profile>.yml) override these.
-# Active profile: "dev" by default; set SPRING_PROFILES_ACTIVE=prod in production.
+
+# Shared settings for every profile.
+# Profile files override these settings.
 
 spring:
   application:
     name: education-platform
+
   profiles:
     default: dev
+
   config:
-    # Local secrets (DB password, JWT key…) live in a git-ignored .env file — see .env.example
     import: optional:file:.env[.properties]
 
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
-    hikari:
-      idle-timeout: 30000
 
   jpa:
-    open-in-view: false          # no lazy loading from controllers — avoids hidden N+1 queries
+    open-in-view: false
     hibernate:
-      ddl-auto: validate         # Flyway owns the schema; Hibernate only checks it matches
+      ddl-auto: validate
     properties:
       hibernate.jdbc.time_zone: UTC
 
   flyway:
-    # db/content is curriculum data (modules, chapters, quizzes); tests leave it out to start empty
     locations: classpath:db/migration,classpath:db/content
 
   messages:
-    fallback-to-system-locale: false   # always serve messages.properties (French), never the JVM's locale
+    fallback-to-system-locale: false
 
   servlet:
     multipart:
-      max-file-size: 500MB      # matches app.storage.max-file-size
-      max-request-size: 520MB   # one file plus its form fields
+      max-file-size: 500MB
+      max-request-size: 520MB
 
 logging:
   pattern:
-    # [requestId] on every line: one request's story can be grepped out of the interleaving
     console: "%d{HH:mm:ss.SSS} %-5level [%X{requestId:-no-request}] %logger{32} - %msg%n"
 
 server:
-  # Render (and most hosts) give the port in PORT; SERVER_PORT still works locally
   port: ${PORT:${SERVER_PORT:8080}}
 
 management:
@@ -67,31 +64,29 @@ springdoc:
 
 app:
   mail:
-    # Sender address. With Brevo it must be a sender verified in the Brevo account.
     from: ${APP_MAIL_FROM:no-reply@eduflow.dz}
     from-name: ${APP_MAIL_FROM_NAME:EduFlow}
-    # Address of the Angular site, used to build the links inside e-mails (reset password…)
     base-url: ${FRONTEND_URL:http://localhost:5173}
+
   bootstrap:
-    # First admin of an empty database (production). Ignored as soon as any admin exists.
     admin:
       email: ${ADMIN_EMAIL:}
       password: ${ADMIN_PASSWORD:}
       full-name: ${ADMIN_FULL_NAME:Administrateur}
+
   jwt:
-    # Base64 key, at least 256 bits. Generate one with: openssl rand -base64 32
-    # No default on purpose — production must fail to start rather than sign with a known key.
     secret: ${JWT_SECRET}
-    access-token-ttl: 15m     # short: an access token cannot be revoked
-    refresh-token-ttl: 30d    # long: revocable through the refresh_tokens table
+    access-token-ttl: 15m
+    refresh-token-ttl: 30d
+
   security:
     login:
-      max-failures: 5     # consecutive failures tolerated per email address
+      max-failures: 5
       lockout: 15m
+
   storage:
     location: ${STORAGE_LOCATION:./var/uploads}
     max-file-size: 500MB
-    # An allow-list, never a deny-list: anything unlisted is refused
     allowed-content-types:
       - application/pdf
       - application/zip
@@ -101,5 +96,6 @@ app:
       - text/plain
       - application/msword
       - application/vnd.openxmlformats-officedocument.wordprocessingml.document
+
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}

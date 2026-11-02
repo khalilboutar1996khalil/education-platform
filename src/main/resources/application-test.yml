@@ -1,28 +1,30 @@
-# Automated tests (./gradlew test). Uses a separate database so tests never touch your dev data.
+
+# Automated tests (./gradlew test).
+# Uses a separate database so tests never touch dev data.
 
 spring:
   datasource:
     url: ${TEST_DB_URL:jdbc:postgresql://localhost:5432/eduflow_test}
     username: ${TEST_DB_USERNAME:eduflow}
     password: ${TEST_DB_PASSWORD:eduflow}
+
   flyway:
-    # Schema only: the curriculum in db/content would break every "the table starts empty" assertion
+    # Schema only: exclude curriculum content from tests.
     locations: classpath:db/migration
 
 app:
-  # A job firing mid-test would move data under an assertion
   jobs:
     enabled: false
+
   storage:
-    # A throwaway directory, so tests never write into the dev uploads
     location: ${java.io.tmpdir}/eduflow-test-uploads
+
   security:
     login:
-      # Effectively disabled: the dedicated rate-limit test lowers it with @TestPropertySource.
       max-failures: 1000
       lockout: 1m
+
   jwt:
-    # Fixed test key so tests never depend on the environment.
     secret: ZWR1Zmxvdy1sb2NhbC1kZXYtb25seS1rZXktbm90LWEtc2VjcmV0LTAwMDAwMA==
     access-token-ttl: 15m
     refresh-token-ttl: 1d
