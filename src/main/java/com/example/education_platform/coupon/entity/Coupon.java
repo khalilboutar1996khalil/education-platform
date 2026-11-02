@@ -2,6 +2,7 @@ package com.example.education_platform.coupon.entity;
 
 import com.example.education_platform.common.BaseEntity;
 import com.example.education_platform.user.entity.User;
+import com.example.education_platform.user.entity.UserStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -51,5 +52,16 @@ public class Coupon extends BaseEntity {
     public void redeem(User student, Instant now) {
         this.redeemedBy = student;
         this.redeemedAt = now;
+    }
+
+    /** The admin refused the activation: the book's code works again. */
+    public void release() {
+        this.redeemedBy = null;
+        this.redeemedAt = null;
+    }
+
+    /** Activated, and the student is still waiting for the admin to accept them. */
+    public boolean isPending() {
+        return redeemedBy != null && redeemedBy.getStatus() == UserStatus.PENDING;
     }
 }

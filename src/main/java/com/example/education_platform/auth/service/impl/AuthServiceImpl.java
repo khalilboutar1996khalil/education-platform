@@ -71,6 +71,11 @@ public class AuthServiceImpl implements AuthService {
 
         User user = found.get();
         rateLimiter.recordSuccess(email);
+        if (user.getStatus() == UserStatus.PENDING) {
+            // Only said once the password is right, so it reveals nothing to a stranger
+            throw new BusinessException(
+                    "Votre compte est en attente de validation par votre professeur. Réessayez plus tard.");
+        }
         return startSession(user, userAgent, ipAddress);
     }
 

@@ -13,6 +13,8 @@ public record CouponResponse(
         String serial,
         String code,
         boolean redeemed,
+        /** Activated, waiting for the admin to accept the student. */
+        boolean pending,
         Instant redeemedAt,
         String redeemedByName,
         String redeemedByUsername) {
