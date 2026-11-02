@@ -7,6 +7,7 @@ import com.example.education_platform.coupon.repository.CouponRepository;
 import com.example.education_platform.user.entity.Level;
 import com.example.education_platform.user.entity.Role;
 import com.example.education_platform.user.entity.User;
+import com.example.education_platform.user.entity.UserStatus;
 import com.example.education_platform.user.repository.UserRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -85,13 +86,21 @@ class CouponApiIntegrationTest {
     void batchesAreListedWithHowManyCouponsWereUsed() throws Exception {
         JsonNode batch = createBatch(ADMIN, "SEVENTH_BASE", 2, null);
         JsonNode first = listCoupons(batch.at("/id").asLong()).get(0);
-        bodyOf(redeem(first.at("/serial").asText(), first.at("/code").asText(), "Amina", "Bensalem"), 201);
+        bodyOf(redeem(first.at("/serial").asText(), first.at("/code").asText(), "Amina", "Bensalem"), 202);
+
+        JsonNode waiting = bodyOf(get("/api/v1/coupons/batches", ADMIN), 200);
+        assertThat(waiting.at("/content/0/redeemed").asLong()).isZero();
+        assertThat(waiting.at("/content/0/pending").asLong()).isEqualTo(1);
+        assertThat(listCoupons(batch.at("/id").asLong()).get(0).at("/pending").asBoolean()).isTrue();
+
+        approve(first.at("/id").asLong());
 
         JsonNode page = bodyOf(get("/api/v1/coupons/batches", ADMIN), 200);
-
         assertThat(page.at("/content/0/redeemed").asLong()).isEqualTo(1);
+        assertThat(page.at("/content/0/pending").asLong()).isZero();
         JsonNode used = listCoupons(batch.at("/id").asLong()).get(0);
         assertThat(used.at("/redeemed").asBoolean()).isTrue();
+        assertThat(used.at("/pending").asBoolean()).isFalse();
         assertThat(used.at("/redeemedByName").asText()).isEqualTo("Amina Bensalem");
         assertThat(used.at("/redeemedByUsername").asText()).isEqualTo("amina.bensalem");
     }
@@ -119,28 +128,97 @@ class CouponApiIntegrationTest {
     // ---------- activating a book ----------
 
     @Test
-    void redeemingCreatesAStudentAtTheBooksLevelAndSignsThemIn() throws Exception {
+    void redeemingCreatesAWaitingStudentAtTheBooksLevelWithoutSigningThemIn() throws Exception {
         Coupon coupon = firstCouponOf("SEVENTH_BASE");
 
-        JsonNode body = bodyOf(redeem(coupon.getSerial(), coupon.getCode(), "Amina", "Bensalem"), 201);
+        JsonNode body = bodyOf(redeem(coupon.getSerial(), coupon.getCode(), "Amina", "Bensalem"), 202);
 
-        assertThat(body.at("/tokens/accessToken").asText()).isNotBlank();
-        assertThat(body.at("/user/role").asText()).isEqualTo("STUDENT");
-        assertThat(body.at("/user/level").asText()).isEqualTo("SEVENTH_BASE");
-        assertThat(body.at("/user/fullName").asText()).isEqualTo("Amina Bensalem");
-        assertThat(body.at("/user/username").asText()).isEqualTo("amina.bensalem");
-        assertThat(body.at("/user/email").isNull()).describedAs("no email is asked for").isTrue();
+        assertThat(body.has("tokens")).describedAs("no session before the admin accepts").isFalse();
+        assertThat(body.at("/fullName").asText()).isEqualTo("Amina Bensalem");
+        assertThat(body.at("/username").asText()).isEqualTo("amina.bensalem");
+        assertThat(body.at("/level").asText()).isEqualTo("SEVENTH_BASE");
+        User created = users.findByUsername("amina.bensalem").orElseThrow();
+        assertThat(created.getStatus()).isEqualTo(UserStatus.PENDING);
+        assertThat(created.getEmail()).describedAs("no email is asked for").isNull();
     }
 
     @Test
-    void theStudentCanSignInAgainWithTheirUsername() throws Exception {
+    void aWaitingStudentCannotSignInUntilTheAdminAccepts() throws Exception {
         Coupon coupon = firstCouponOf("SEVENTH_BASE");
-        bodyOf(redeem(coupon.getSerial(), coupon.getCode(), "Amina", "Bensalem"), 201);
+        bodyOf(redeem(coupon.getSerial(), coupon.getCode(), "Amina", "Bensalem"), 202);
 
-        JsonNode body = bodyOf(post("/api/v1/auth/login", """
-                {"email":"Amina.Bensalem","password":"%s"}""".formatted(PASSWORD), null), 200);
+        JsonNode refused = bodyOf(login("Amina.Bensalem"), 422);
+        assertThat(refused.at("/detail").asText()).contains("attente de validation");
 
+        approve(coupon.getId());
+
+        JsonNode body = bodyOf(login("Amina.Bensalem"), 200);
         assertThat(body.at("/user/username").asText()).isEqualTo("amina.bensalem");
+        assertThat(body.at("/user/status").asText()).isEqualTo("ACTIVE");
+    }
+
+    @Test
+    void theWaitingMessageIsOnlyGivenWithTheRightPassword() throws Exception {
+        Coupon coupon = firstCouponOf("SEVENTH_BASE");
+        bodyOf(redeem(coupon.getSerial(), coupon.getCode(), "Amina", "Bensalem"), 202);
+
+        assertThat(post("/api/v1/auth/login", """
+                {"email":"amina.bensalem","password":"wrong-password-1"}""", null))
+                .describedAs("a stranger learns nothing about the account").hasStatus(401);
+    }
+
+    @Test
+    void theAdminSeesTheQueueWithWhoActivatedWhichBook() throws Exception {
+        JsonNode batch = createBatch(ADMIN, "SEVENTH_BASE", 2, "Cours de 7e année");
+        var list = coupons.findByBatchIdOrderBySerialAsc(batch.at("/id").asLong());
+        bodyOf(redeem(list.get(0).getSerial(), list.get(0).getCode(), "Amina", "Bensalem"), 202);
+
+        JsonNode queue = bodyOf(get("/api/v1/coupons/pending", ADMIN), 200);
+
+        assertThat(queue.size()).isEqualTo(1);
+        assertThat(queue.get(0).at("/couponId").asLong()).isEqualTo(list.get(0).getId());
+        assertThat(queue.get(0).at("/serial").asText()).isEqualTo(list.get(0).getSerial());
+        assertThat(queue.get(0).at("/studentName").asText()).isEqualTo("Amina Bensalem");
+        assertThat(queue.get(0).at("/username").asText()).isEqualTo("amina.bensalem");
+        assertThat(queue.get(0).at("/batchLabel").asText()).isEqualTo("Cours de 7e année");
+        assertThat(queue.get(0).at("/level").asText()).isEqualTo("SEVENTH_BASE");
+
+        approve(list.get(0).getId());
+        assertThat(bodyOf(get("/api/v1/coupons/pending", ADMIN), 200).size()).isZero();
+    }
+
+    @Test
+    void refusingRemovesTheAccountAndFreesTheCode() throws Exception {
+        Coupon coupon = firstCouponOf("SEVENTH_BASE");
+        bodyOf(redeem(coupon.getSerial(), coupon.getCode(), "Sami", "Trabelsi"), 202);
+
+        assertThat(post("/api/v1/coupons/" + coupon.getId() + "/reject", "{}", ADMIN)).hasStatus(204);
+
+        assertThat(users.findByUsername("sami.trabelsi")).isEmpty();
+        assertThat(bodyOf(get("/api/v1/coupons/pending", ADMIN), 200).size()).isZero();
+        assertThat(redeem(coupon.getSerial(), coupon.getCode(), "Amina", "Bensalem"))
+                .describedAs("the real buyer can still activate the book").hasStatus(202);
+    }
+
+    @Test
+    void aDecisionIsTakenOnce() throws Exception {
+        Coupon coupon = firstCouponOf("SEVENTH_BASE");
+        bodyOf(redeem(coupon.getSerial(), coupon.getCode(), "Amina", "Bensalem"), 202);
+        approve(coupon.getId());
+
+        assertThat(post("/api/v1/coupons/" + coupon.getId() + "/approve", "{}", ADMIN)).hasStatus(409);
+        assertThat(post("/api/v1/coupons/" + coupon.getId() + "/reject", "{}", ADMIN)).hasStatus(409);
+        assertThat(users.findByUsername("amina.bensalem")).isPresent();
+    }
+
+    @Test
+    void onlyTheAdminDecides() throws Exception {
+        Coupon coupon = firstCouponOf("SEVENTH_BASE");
+        bodyOf(redeem(coupon.getSerial(), coupon.getCode(), "Amina", "Bensalem"), 202);
+
+        assertThat(get("/api/v1/coupons/pending", STUDENT)).hasStatus(403);
+        assertThat(post("/api/v1/coupons/" + coupon.getId() + "/approve", "{}", STUDENT)).hasStatus(403);
+        assertThat(post("/api/v1/coupons/" + coupon.getId() + "/reject", "{}", STUDENT)).hasStatus(403);
     }
 
     @Test
@@ -148,13 +226,13 @@ class CouponApiIntegrationTest {
         Coupon coupon = firstCouponOf("SEVENTH_BASE");
         String typed = coupon.getCode().substring(0, 4).toLowerCase() + " - " + coupon.getCode().substring(4);
 
-        assertThat(redeem(coupon.getSerial(), typed, "Amina", "Bensalem")).hasStatus(201);
+        assertThat(redeem(coupon.getSerial(), typed, "Amina", "Bensalem")).hasStatus(202);
     }
 
     @Test
     void aCouponWorksOnlyOnce() throws Exception {
         Coupon coupon = firstCouponOf("SEVENTH_BASE");
-        bodyOf(redeem(coupon.getSerial(), coupon.getCode(), "Amina", "Bensalem"), 201);
+        bodyOf(redeem(coupon.getSerial(), coupon.getCode(), "Amina", "Bensalem"), 202);
 
         assertThat(redeem(coupon.getSerial(), coupon.getCode(), "Sami", "Trabelsi")).hasStatus(409);
     }
@@ -199,10 +277,10 @@ class CouponApiIntegrationTest {
         JsonNode batch = createBatch(ADMIN, "SEVENTH_BASE", 2, null);
         var list = coupons.findByBatchIdOrderBySerialAsc(batch.at("/id").asLong());
 
-        bodyOf(redeem(list.get(0).getSerial(), list.get(0).getCode(), "Amina", "Ben Salem"), 201);
-        JsonNode second = bodyOf(redeem(list.get(1).getSerial(), list.get(1).getCode(), "Amina", "Ben Salem"), 201);
+        bodyOf(redeem(list.get(0).getSerial(), list.get(0).getCode(), "Amina", "Ben Salem"), 202);
+        JsonNode second = bodyOf(redeem(list.get(1).getSerial(), list.get(1).getCode(), "Amina", "Ben Salem"), 202);
 
-        assertThat(second.at("/user/username").asText()).isEqualTo("amina.bensalem2");
+        assertThat(second.at("/username").asText()).isEqualTo("amina.bensalem2");
     }
 
     @Test
@@ -211,12 +289,12 @@ class CouponApiIntegrationTest {
         var list = coupons.findByBatchIdOrderBySerialAsc(batch.at("/id").asLong());
 
         JsonNode accented = bodyOf(
-                redeem(list.get(0).getSerial(), list.get(0).getCode(), "Hélène", "Zaïri"), 201);
-        JsonNode arabic = bodyOf(redeem(list.get(1).getSerial(), list.get(1).getCode(), "أمينة", "بن سالم"), 201);
+                redeem(list.get(0).getSerial(), list.get(0).getCode(), "Hélène", "Zaïri"), 202);
+        JsonNode arabic = bodyOf(redeem(list.get(1).getSerial(), list.get(1).getCode(), "أمينة", "بن سالم"), 202);
 
-        assertThat(accented.at("/user/username").asText()).isEqualTo("helene.zairi");
-        assertThat(arabic.at("/user/username").asText()).isEqualTo("eleve");
-        assertThat(arabic.at("/user/fullName").asText()).isEqualTo("أمينة بن سالم");
+        assertThat(accented.at("/username").asText()).isEqualTo("helene.zairi");
+        assertThat(arabic.at("/username").asText()).isEqualTo("eleve");
+        assertThat(arabic.at("/fullName").asText()).isEqualTo("أمينة بن سالم");
     }
 
     @Test
@@ -250,6 +328,15 @@ class CouponApiIntegrationTest {
 
     private JsonNode listCoupons(long batchId) throws Exception {
         return bodyOf(get("/api/v1/coupons/batches/" + batchId + "/coupons", ADMIN), 200);
+    }
+
+    private void approve(long couponId) {
+        assertThat(post("/api/v1/coupons/" + couponId + "/approve", "{}", ADMIN)).hasStatus(204);
+    }
+
+    private MvcTestResult login(String username) {
+        return post("/api/v1/auth/login", """
+                {"email":"%s","password":"%s"}""".formatted(username, PASSWORD), null);
     }
 
     private MvcTestResult redeem(String serial, String code, String firstName, String lastName) {

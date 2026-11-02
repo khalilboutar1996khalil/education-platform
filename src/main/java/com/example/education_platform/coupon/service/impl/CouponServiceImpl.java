@@ -1,7 +1,5 @@
 package com.example.education_platform.coupon.service.impl;
 
-import com.example.education_platform.auth.dto.response.LoginResponse;
-import com.example.education_platform.auth.service.AuthService;
 import com.example.education_platform.common.PageResponse;
 import com.example.education_platform.common.exception.BusinessException;
 import com.example.education_platform.common.exception.ConflictException;
@@ -10,6 +8,8 @@ import com.example.education_platform.coupon.dto.request.CreateCouponBatchReques
 import com.example.education_platform.coupon.dto.request.RedeemCouponRequest;
 import com.example.education_platform.coupon.dto.response.CouponBatchResponse;
 import com.example.education_platform.coupon.dto.response.CouponResponse;
+import com.example.education_platform.coupon.dto.response.PendingActivationResponse;
+import com.example.education_platform.coupon.dto.response.RedeemCouponResponse;
 import com.example.education_platform.coupon.entity.Coupon;
 import com.example.education_platform.coupon.entity.CouponBatch;
 import com.example.education_platform.coupon.repository.CouponBatchRepository;
@@ -18,6 +18,7 @@ import com.example.education_platform.coupon.service.CouponService;
 import com.example.education_platform.security.LoginRateLimiter;
 import com.example.education_platform.user.entity.Role;
 import com.example.education_platform.user.entity.User;
+import com.example.education_platform.user.entity.UserStatus;
 import com.example.education_platform.user.repository.UserRepository;
 import java.security.SecureRandom;
 import java.text.Normalizer;
@@ -49,7 +50,6 @@ public class CouponServiceImpl implements CouponService {
     private final UserRepository users;
     private final PasswordEncoder passwordEncoder;
     private final LoginRateLimiter rateLimiter;
-    private final AuthService authService;
 
     @Override
     @Transactional
@@ -64,7 +64,7 @@ public class CouponServiceImpl implements CouponService {
             created.add(new Coupon(batch, serial, newCode(issued)));
         }
         coupons.saveAll(created);
-        return toResponse(batch, 0);
+        return toResponse(batch, 0, 0);
     }
 
     @Override
@@ -72,7 +72,9 @@ public class CouponServiceImpl implements CouponService {
     public PageResponse<CouponBatchResponse> listBatches(Pageable pageable) {
         Page<CouponBatch> page = batches.findLatestFirst(pageable);
         List<CouponBatchResponse> content = page.getContent().stream()
-                .map(batch -> toResponse(batch, coupons.countRedeemed(batch.getId())))
+                .map(batch -> toResponse(batch,
+                        coupons.countRedeemed(batch.getId(), UserStatus.PENDING),
+                        coupons.countPending(batch.getId(), UserStatus.PENDING)))
                 .toList();
         return PageResponse.from(page, content);
     }
@@ -88,7 +90,7 @@ public class CouponServiceImpl implements CouponService {
 
     @Override
     @Transactional
-    public LoginResponse redeem(RedeemCouponRequest request, String userAgent, String ipAddress) {
+    public RedeemCouponResponse redeem(RedeemCouponRequest request) {
         String serial = request.serial().trim().toUpperCase(Locale.ROOT);
         String code = normaliseCode(request.code());
         // Throttled per serial: guessing the code of one book stops after a few tries
@@ -111,11 +113,48 @@ public class CouponServiceImpl implements CouponService {
         User student = new User(fullName, null, passwordEncoder.encode(request.password()),
                 Role.STUDENT, coupon.getBatch().getLevel());
         student.setUsername(uniqueUsername(request.firstName(), request.lastName()));
+        // Anyone in the shop can scan the QR code; the admin checks who really bought the book
+        student.setStatus(UserStatus.PENDING);
         users.save(student);
 
         coupon.redeem(student, Instant.now());
         rateLimiter.recordSuccess(throttleKey);
-        return authService.startSession(student, userAgent, ipAddress);
+        return new RedeemCouponResponse(student.getFullName(), student.getUsername(), student.getLevel());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PendingActivationResponse> pending() {
+        return coupons.findPending(UserStatus.PENDING).stream()
+                .map(c -> new PendingActivationResponse(c.getId(), c.getSerial(), c.getBatch().getId(),
+                        c.getBatch().getLabel(), c.getBatch().getLevel(), c.getRedeemedBy().getFullName(),
+                        c.getRedeemedBy().getUsername(), c.getRedeemedAt()))
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    public void approve(Long couponId) {
+        pendingCoupon(couponId).getRedeemedBy().setStatus(UserStatus.ACTIVE);
+    }
+
+    @Override
+    @Transactional
+    public void reject(Long couponId) {
+        Coupon coupon = pendingCoupon(couponId);
+        User student = coupon.getRedeemedBy();
+        coupon.release();
+        // The account never had access: removing it also frees the username for whoever asks next
+        users.delete(student);
+    }
+
+    private Coupon pendingCoupon(Long couponId) {
+        Coupon coupon = coupons.findDetailById(couponId)
+                .orElseThrow(() -> new ResourceNotFoundException("Coupon", couponId));
+        if (!coupon.isPending()) {
+            throw new ConflictException("Cette activation a déjà été traitée.");
+        }
+        return coupon;
     }
 
     /** Upper case, without the dash or spaces a student may type: "k7p2 qx9m" matches "K7P2QX9M". */
@@ -164,15 +203,15 @@ public class CouponServiceImpl implements CouponService {
         }
     }
 
-    private static CouponBatchResponse toResponse(CouponBatch batch, long redeemed) {
+    private static CouponBatchResponse toResponse(CouponBatch batch, long redeemed, long pending) {
         return new CouponBatchResponse(batch.getId(), batch.getLevel(), batch.getQuantity(), batch.getLabel(),
-                redeemed, batch.getCreatedAt());
+                redeemed, pending, batch.getCreatedAt());
     }
 
     private static CouponResponse toResponse(Coupon coupon) {
         User student = coupon.getRedeemedBy();
         return new CouponResponse(coupon.getId(), coupon.getSerial(), coupon.getCode(), coupon.isRedeemed(),
-                coupon.getRedeemedAt(),
+                coupon.isPending(), coupon.getRedeemedAt(),
                 student == null ? null : student.getFullName(),
                 student == null ? null : student.getUsername());
     }

@@ -1,16 +1,16 @@
 package com.example.education_platform.coupon.controller;
 
-import com.example.education_platform.auth.dto.response.LoginResponse;
 import com.example.education_platform.common.PageResponse;
 import com.example.education_platform.coupon.dto.request.CreateCouponBatchRequest;
 import com.example.education_platform.coupon.dto.request.RedeemCouponRequest;
 import com.example.education_platform.coupon.dto.response.CouponBatchResponse;
 import com.example.education_platform.coupon.dto.response.CouponResponse;
+import com.example.education_platform.coupon.dto.response.PendingActivationResponse;
+import com.example.education_platform.coupon.dto.response.RedeemCouponResponse;
 import com.example.education_platform.coupon.service.CouponService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -58,10 +58,33 @@ public class CouponController {
     }
 
     @PostMapping("/redeem")
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.ACCEPTED)
     @SecurityRequirements // public: the student has no account until this call creates it
-    @Operation(summary = "Activate a book: creates the student account for its level and signs it in")
-    LoginResponse redeem(@Valid @RequestBody RedeemCouponRequest request, HttpServletRequest http) {
-        return couponService.redeem(request, http.getHeader("User-Agent"), http.getRemoteAddr());
+    @Operation(summary = "Activate a book: creates the student account, waiting for the admin's approval")
+    RedeemCouponResponse redeem(@Valid @RequestBody RedeemCouponRequest request) {
+        return couponService.redeem(request);
+    }
+
+    @GetMapping("/pending")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Book activations waiting for a decision, oldest first")
+    List<PendingActivationResponse> pending() {
+        return couponService.pending();
+    }
+
+    @PostMapping("/{id}/approve")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Accept a book activation: the student can sign in from now on")
+    void approve(@PathVariable Long id) {
+        couponService.approve(id);
+    }
+
+    @PostMapping("/{id}/reject")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Refuse a book activation: the account is removed and the code works again")
+    void reject(@PathVariable Long id) {
+        couponService.reject(id);
     }
 }
