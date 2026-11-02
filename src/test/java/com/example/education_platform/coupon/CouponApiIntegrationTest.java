@@ -212,6 +212,50 @@ class CouponApiIntegrationTest {
     }
 
     @Test
+    void theAdminCanAcceptAWaitingStudentFromTheStudentList() throws Exception {
+        Coupon coupon = firstCouponOf("SEVENTH_BASE");
+        bodyOf(redeem(coupon.getSerial(), coupon.getCode(), "Amina", "Bensalem"), 202);
+        long id = users.findByUsername("amina.bensalem").orElseThrow().getId();
+
+        JsonNode body = bodyOf(post("/api/v1/users/" + id + "/approve", "{}", ADMIN), 200);
+
+        assertThat(body.at("/status").asText()).isEqualTo("ACTIVE");
+        assertThat(bodyOf(login("amina.bensalem"), 200).at("/user/username").asText()).isEqualTo("amina.bensalem");
+    }
+
+    @Test
+    void refusingFromTheStudentListAlsoFreesTheBook() throws Exception {
+        Coupon coupon = firstCouponOf("SEVENTH_BASE");
+        bodyOf(redeem(coupon.getSerial(), coupon.getCode(), "Sami", "Trabelsi"), 202);
+        long id = users.findByUsername("sami.trabelsi").orElseThrow().getId();
+
+        assertThat(post("/api/v1/users/" + id + "/reject", "{}", ADMIN)).hasStatus(204);
+
+        assertThat(users.findByUsername("sami.trabelsi")).isEmpty();
+        assertThat(redeem(coupon.getSerial(), coupon.getCode(), "Amina", "Bensalem")).hasStatus(202);
+    }
+
+    @Test
+    void aWaitingStudentWhoseCouponWasClearedCanStillBeDecided() throws Exception {
+        Coupon coupon = firstCouponOf("SEVENTH_BASE");
+        bodyOf(redeem(coupon.getSerial(), coupon.getCode(), "Amina", "Bensalem"), 202);
+        long id = users.findByUsername("amina.bensalem").orElseThrow().getId();
+        coupons.deleteAll();
+        coupons.flush();
+
+        assertThat(post("/api/v1/users/" + id + "/approve", "{}", ADMIN)).hasStatus(200);
+    }
+
+    @Test
+    void onlyAWaitingStudentCanBeAcceptedOrRefused() {
+        long active = users.findByEmail(STUDENT).orElseThrow().getId();
+
+        assertThat(post("/api/v1/users/" + active + "/approve", "{}", ADMIN)).hasStatus(409);
+        assertThat(post("/api/v1/users/" + active + "/reject", "{}", ADMIN)).hasStatus(409);
+        assertThat(post("/api/v1/users/" + active + "/approve", "{}", STUDENT)).hasStatus(403);
+    }
+
+    @Test
     void onlyTheAdminDecides() throws Exception {
         Coupon coupon = firstCouponOf("SEVENTH_BASE");
         bodyOf(redeem(coupon.getSerial(), coupon.getCode(), "Amina", "Bensalem"), 202);

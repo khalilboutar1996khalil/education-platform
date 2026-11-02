@@ -5,6 +5,8 @@ import com.example.education_platform.common.PageResponse;
 import com.example.education_platform.common.exception.BusinessException;
 import com.example.education_platform.common.exception.ConflictException;
 import com.example.education_platform.common.exception.ResourceNotFoundException;
+import com.example.education_platform.coupon.entity.Coupon;
+import com.example.education_platform.coupon.repository.CouponRepository;
 import com.example.education_platform.mail.service.EmailService;
 import com.example.education_platform.security.AccessGuard;
 import com.example.education_platform.security.CurrentUser;
@@ -47,6 +49,7 @@ public class UserServiceImpl implements UserService {
     private final CurrentUser currentUser;
     private final AccessGuard accessGuard;
     private final EmailService emailService;
+    private final CouponRepository coupons;
 
     @Override
     @Transactional
@@ -94,6 +97,31 @@ public class UserServiceImpl implements UserService {
             refreshTokens.revokeAllForUser(user.getId(), Instant.now());
         }
         return userMapper.toResponse(user);
+    }
+
+    @Override
+    @Transactional
+    public UserResponse approvePending(Long id) {
+        User student = pendingStudent(id);
+        student.setStatus(UserStatus.ACTIVE);
+        return userMapper.toResponse(student);
+    }
+
+    @Override
+    @Transactional
+    public void rejectPending(Long id) {
+        User student = pendingStudent(id);
+        // Its coupon may have been cleared already; when it is still there, the real buyer can use it
+        coupons.findByRedeemedById(id).ifPresent(Coupon::release);
+        users.delete(student);
+    }
+
+    private User pendingStudent(Long id) {
+        User user = users.findById(id).orElseThrow(() -> new ResourceNotFoundException("User", id));
+        if (user.getStatus() != UserStatus.PENDING) {
+            throw new ConflictException("Ce compte n'est pas en attente de validation.");
+        }
+        return user;
     }
 
     @Override

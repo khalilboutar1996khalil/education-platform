@@ -24,6 +24,12 @@ public interface UserService {
 
     PasswordResetResponse resetPassword(Long id);
 
+    /** A student waiting after activating a book can sign in from now on. */
+    UserResponse approvePending(Long id);
+
+    /** A waiting student is removed; the book they activated, if it still exists, works again. */
+    void rejectPending(Long id);
+
     UserResponse getCurrentProfile();
 
     UserResponse updateCurrentProfile(UpdateProfileRequest request);
