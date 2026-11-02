@@ -20,6 +20,9 @@ public interface CouponRepository extends JpaRepository<Coupon, Long> {
 
     boolean existsByCode(String code);
 
+    /** The book a waiting student activated, if their coupon still exists. */
+    Optional<Coupon> findByRedeemedById(Long userId);
+
     @EntityGraph(attributePaths = "redeemedBy")
     List<Coupon> findByBatchIdOrderBySerialAsc(Long batchId);
 

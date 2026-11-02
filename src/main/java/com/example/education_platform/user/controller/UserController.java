@@ -72,6 +72,21 @@ public class UserController {
         return userService.updateStatus(id, request.status());
     }
 
+    @PostMapping("/{id}/approve")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Accept a student waiting after activating a book: they can sign in from now on")
+    UserResponse approvePending(@PathVariable Long id) {
+        return userService.approvePending(id);
+    }
+
+    @PostMapping("/{id}/reject")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Refuse a waiting student: the account is removed and their book's code works again")
+    void rejectPending(@PathVariable Long id) {
+        userService.rejectPending(id);
+    }
+
     @PostMapping("/{id}/reset-password")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Give a student a new one-time temporary password; this signs them out everywhere")
