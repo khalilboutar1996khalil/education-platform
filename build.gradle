@@ -45,6 +45,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'com.github.ben-manes.caffeine:caffeine'
 
+    // Uploads in an S3-compatible object store (Cloudflare R2) when app.storage.type=s3
+    implementation platform('software.amazon.awssdk:bom:2.31.0')
+    implementation 'software.amazon.awssdk:s3'
+
     // Monitoring (health checks, info)
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 

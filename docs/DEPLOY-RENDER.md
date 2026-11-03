@@ -89,9 +89,44 @@ CORS_ALLOWED_ORIGINS=http://localhost:4200
 
 Puis `./gradlew bootRun`.
 
-## Fichiers déposés
+## Fichiers déposés : Cloudflare R2
 
-Le stockage actuel écrit sur le disque du serveur. Sur Render gratuit, ce disque est effacé à chaque
-redémarrage : les PDF et devoirs déposés disparaissent (les lignes en base restent, mais pointent
-vers des fichiers absents). Pour un usage réel, il faut un stockage objet compatible S3
-(Cloudflare R2 gratuit jusqu'à 10 Go, ou le stockage objet de Neon), ou un disque persistant Render (payant).
+Sur Render gratuit, le disque est effacé à chaque redémarrage : les fichiers déposés (rendus de TP,
+ressources, PDF) seraient perdus. L'API sait donc écrire dans un stockage objet compatible S3.
+Cloudflare R2 est gratuit jusqu'à 10 Go.
+
+1. Cloudflare → **R2** → **Create bucket** : nom `eduflow` (laisser privé, pas d'accès public).
+2. R2 → **Manage R2 API Tokens** → **Create API token** : permission **Object Read & Write**,
+   limitée au bucket `eduflow`. Notez l'**Access Key ID**, le **Secret Access Key** et l'adresse
+   **S3 API** (`https://<account-id>.r2.cloudflarestorage.com`).
+3. Render → service `eduflow-api` → **Environment** :
+
+| Variable | Valeur |
+|---|---|
+| `STORAGE_TYPE` | `s3` |
+| `S3_ENDPOINT` | `https://<account-id>.r2.cloudflarestorage.com` |
+| `S3_REGION` | `auto` |
+| `S3_BUCKET` | `eduflow` |
+| `S3_ACCESS_KEY` | l'Access Key ID |
+| `S3_SECRET_KEY` | le Secret Access Key |
+
+4. Enregistrez : Render redémarre l'API. Déposez un PDF dans Ressources, redéployez, puis
+   téléchargez-le : il doit toujours être là.
+
+Sans `STORAGE_TYPE` (ou avec `local`), l'API garde le disque du serveur, comme en développement.
+Les fichiers déposés **avant** le passage à R2 ne sont pas déplacés : ils étaient déjà perdus au
+dernier redémarrage, il faut les déposer à nouveau.
+
+## Garder l'API réveillée
+
+Le workflow `.github/workflows/keep-awake.yml` appelle `/actuator/health/liveness` toutes les
+10 minutes, pour que l'API ne s'endorme pas (sinon la première visite attend 30 à 60 s, par
+exemple un élève qui scanne un QR code du livre). La sonde *liveness* n'interroge pas la base,
+donc Neon peut continuer à se mettre en veille.
+
+- L'adresse appelée est la variable de dépôt `API_URL` (GitHub → Settings → Secrets and variables →
+  Actions → **Variables**), par défaut `https://eduflow-api-iqq9.onrender.com`.
+- Une API toujours éveillée consomme environ 744 h par mois ; le plan gratuit de Render en donne
+  750 par compte. Si vous avez d'autres services gratuits sur Render, ils partagent ce total.
+- GitHub peut retarder les tâches planifiées de quelques minutes, et les suspend après 60 jours
+  sans activité sur le dépôt.
