@@ -1,0 +1,24 @@
+# Keeps the Render free-plan API awake, so a student scanning a book QR code does not wait
+# 30-60 s for a cold start. Calls the liveness probe, which does not touch the database.
+# See docs/DEPLOY-RENDER.md, « Garder l'API réveillée ».
+
+name: Keep API awake
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Ping the API
+        env:
+          API_URL: ${{ vars.API_URL || 'https://eduflow-api-iqq9.onrender.com' }}
+        run: |
+          curl --fail --silent --show-error --max-time 90 --retry 2 --retry-delay 10 \
+            "$API_URL/actuator/health/liveness"

@@ -37,5 +37,17 @@ services:
         sync: false
       - key: ADMIN_PASSWORD
         sync: false
+      # Uploads in Cloudflare R2: Render's free disk is wiped on every restart (docs/DEPLOY-RENDER.md)
+      # Set to s3 only once the R2 keys below are filled in, otherwise the API refuses to start
+      - key: STORAGE_TYPE
+        sync: false
+      - key: S3_ENDPOINT
+        sync: false
+      - key: S3_BUCKET
+        sync: false
+      - key: S3_ACCESS_KEY
+        sync: false
+      - key: S3_SECRET_KEY
+        sync: false
       - key: JAVA_OPTS
         value: -XX:MaxRAMPercentage=70

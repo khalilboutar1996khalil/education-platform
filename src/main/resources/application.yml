@@ -85,7 +85,16 @@ app:
       lockout: 15m
 
   storage:
+    # local: the server's disk (fine locally and on a VPS). s3: an object store such as
+    # Cloudflare R2, required on hosts that wipe their disk (Render's free plan).
+    type: ${STORAGE_TYPE:local}
     location: ${STORAGE_LOCATION:./var/uploads}
+    s3:
+      endpoint: ${S3_ENDPOINT:}
+      region: ${S3_REGION:auto}
+      bucket: ${S3_BUCKET:}
+      access-key: ${S3_ACCESS_KEY:}
+      secret-key: ${S3_SECRET_KEY:}
     max-file-size: 500MB
     allowed-content-types:
       - application/pdf
