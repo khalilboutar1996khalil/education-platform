@@ -113,6 +113,17 @@ Cloudflare R2 est gratuit jusqu'à 10 Go.
 4. Enregistrez : Render redémarre l'API. Déposez un PDF dans Ressources, redéployez, puis
    téléchargez-le : il doit toujours être là.
 
+### Variante gratuite sans carte bancaire : Supabase Storage
+
+1. supabase.com → **New project** (région Frankfurt) → **Storage** → **New bucket** `eduflow`, privé.
+2. **Storage → S3 Configuration** : copier l'**Endpoint**
+   (`https://<projet>.storage.supabase.co/storage/v1/s3`), la **Region** (ex. `eu-central-1`),
+   puis **New access key** (Access key ID + Secret access key).
+3. Mêmes variables Render que ci-dessus, avec `S3_REGION` = la région Supabase.
+
+Limites du plan gratuit : 1 Go au total, 50 Mo par fichier, et le projet se met en pause après
+7 jours sans activité (les fichiers restent ; « Restore » dans Supabase).
+
 Sans `STORAGE_TYPE` (ou avec `local`), l'API garde le disque du serveur, comme en développement.
 Les fichiers déposés **avant** le passage à R2 ne sont pas déplacés : ils étaient déjà perdus au
 dernier redémarrage, il faut les déposer à nouveau.
