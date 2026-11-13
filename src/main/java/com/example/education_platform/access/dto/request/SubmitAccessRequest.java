@@ -1,6 +1,7 @@
 package com.example.education_platform.access.dto.request;
 
 import com.example.education_platform.level.validation.KnownLevel;
+import com.example.education_platform.subscription.entity.PaymentMethod;
 import com.example.education_platform.user.entity.Level;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -23,5 +24,12 @@ public record SubmitAccessRequest(
         Level level,
 
         @Size(max = 1000)
-        String message) {
+        String message,
+
+        /** Required when the level has a plan: how the student paid. */
+        PaymentMethod paymentMethod,
+
+        /** Required when the level has a plan: the D17 transaction number or transfer reference. */
+        @Size(max = 100, message = "La référence ne peut pas dépasser 100 caractères")
+        String paymentReference) {
 }

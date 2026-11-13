@@ -20,7 +20,7 @@ import org.springframework.test.web.servlet.assertj.MvcTestResult;
 import org.springframework.transaction.annotation.Transactional;
 
 /** Levels are data the admin manages: a new class year needs no release. */
-@SpringBootTest
+@SpringBootTest(properties = "app.auth.self-registration-enabled=true")
 @AutoConfigureMockMvc
 @Transactional
 class LevelApiIntegrationTest {

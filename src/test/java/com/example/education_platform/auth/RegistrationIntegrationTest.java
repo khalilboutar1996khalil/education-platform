@@ -20,7 +20,7 @@ import org.springframework.test.web.servlet.assertj.MvcTestResult;
 import org.springframework.transaction.annotation.Transactional;
 
 /** Self-registration: a student picks their level and gets an active account and a session. */
-@SpringBootTest
+@SpringBootTest(properties = "app.auth.self-registration-enabled=true")
 @AutoConfigureMockMvc
 @Transactional
 class RegistrationIntegrationTest {

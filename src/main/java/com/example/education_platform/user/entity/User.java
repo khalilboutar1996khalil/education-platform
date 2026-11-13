@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
 import java.util.Locale;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -58,6 +59,12 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private boolean notifyByEmail = true;
 
+    /**
+     * Last day a student may sign in: the end of their subscription, of the school year for a
+     * book coupon. Null means no end, which is the case of admins.
+     */
+    private LocalDate accessUntil;
+
     public User(String fullName, String email, String passwordHash, Role role, Level level) {
         this.fullName = fullName;
         this.email = email;
@@ -68,6 +75,11 @@ public class User extends BaseEntity {
 
     public boolean isAdmin() {
         return role == Role.ADMIN;
+    }
+
+    /** True once the last day of access is behind {@code today}. */
+    public boolean accessExpired(LocalDate today) {
+        return accessUntil != null && accessUntil.isBefore(today);
     }
 
     /** Avatar initials shown throughout the UI, e.g. "Amira Benali" becomes "AB". */

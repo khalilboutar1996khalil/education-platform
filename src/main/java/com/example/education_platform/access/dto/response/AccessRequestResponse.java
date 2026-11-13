@@ -3,9 +3,15 @@ package com.example.education_platform.access.dto.response;
 import com.example.education_platform.access.entity.AccessRequestStatus;
 import com.example.education_platform.user.dto.response.UserResponse;
 import com.example.education_platform.user.entity.Level;
+import com.example.education_platform.subscription.entity.PaymentMethod;
+import java.math.BigDecimal;
 import java.time.Instant;
 
-/** @param createdUser the account an approval produced; null while pending or once refused */
+/**
+ * @param createdUser the account an approval produced (or renewed); null while pending or once refused
+ * @param price       what the plan cost when the student asked; null for a free request
+ * @param renewal     an existing student extending their access rather than a new account
+ */
 public record AccessRequestResponse(
         Long id,
         String fullName,
@@ -17,5 +23,10 @@ public record AccessRequestResponse(
         Instant reviewedAt,
         UserResponse createdUser,
         String decisionNote,
-        Instant submittedAt) {
+        Instant submittedAt,
+        BigDecimal price,
+        Integer durationDays,
+        PaymentMethod paymentMethod,
+        String paymentReference,
+        boolean renewal) {
 }

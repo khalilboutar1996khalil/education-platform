@@ -45,7 +45,9 @@ public class SecurityConfig {
         "/v3/api-docs/**",
         "/swagger-ui/**",
         "/swagger-ui.html",
-        "/error"
+        "/error",
+        // The plans and payment details, shown on the form of somebody who has no account yet
+        "/api/v1/subscriptions/offer"
     };
 
     /** Asking for access is by definition something a person without an account has to do. */

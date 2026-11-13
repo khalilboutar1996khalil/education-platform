@@ -3,6 +3,7 @@ package com.example.education_platform.user.dto.response;
 import com.example.education_platform.user.entity.Level;
 import com.example.education_platform.user.entity.Role;
 import com.example.education_platform.user.entity.UserStatus;
+import java.time.LocalDate;
 
 /**
  * What the API exposes about a user — deliberately without the password hash or audit columns.
@@ -19,5 +20,6 @@ public record UserResponse(
         Level level,
         UserStatus status,
         String locale,
-        boolean notifyByEmail) {
+        boolean notifyByEmail,
+        LocalDate accessUntil) {
 }
