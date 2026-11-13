@@ -107,6 +107,8 @@ public class UserServiceImpl implements UserService {
     public UserResponse approvePending(Long id) {
         User student = pendingStudent(id);
         student.setStatus(UserStatus.ACTIVE);
+        // Waiting accounts come from a book coupon, which is worth the school year
+        student.setAccessUntil(SchoolYear.endOf(SchoolYear.today()));
         return userMapper.toResponse(student);
     }
 
