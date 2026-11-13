@@ -10,6 +10,7 @@ import com.example.education_platform.coupon.repository.CouponRepository;
 import com.example.education_platform.mail.service.EmailService;
 import com.example.education_platform.security.AccessGuard;
 import com.example.education_platform.security.CurrentUser;
+import com.example.education_platform.subscription.entity.SchoolYear;
 import com.example.education_platform.user.dto.request.ChangePasswordRequest;
 import com.example.education_platform.user.dto.request.InviteStudentRequest;
 import com.example.education_platform.user.dto.request.UpdateProfileRequest;
@@ -63,6 +64,8 @@ public class UserServiceImpl implements UserService {
         User student = new User(request.fullName().trim(), email,
                 passwordEncoder.encode(temporaryPassword), Role.STUDENT, request.level());
 
+        // Invited by hand: the school year; an accepted subscription then sets its own end
+        student.setAccessUntil(SchoolYear.endOf(SchoolYear.today()));
         User saved = users.save(student);
         // Still returned as well: without SMTP configured the mail goes nowhere
         emailService.sendInvitation(saved.getEmail(), saved.getFullName(), temporaryPassword);
@@ -104,6 +107,8 @@ public class UserServiceImpl implements UserService {
     public UserResponse approvePending(Long id) {
         User student = pendingStudent(id);
         student.setStatus(UserStatus.ACTIVE);
+        // Waiting accounts come from a book coupon, which is worth the school year
+        student.setAccessUntil(SchoolYear.endOf(SchoolYear.today()));
         return userMapper.toResponse(student);
     }
 

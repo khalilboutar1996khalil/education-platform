@@ -9,6 +9,7 @@ import com.example.education_platform.auth.entity.RefreshToken;
 import com.example.education_platform.auth.repository.PasswordResetTokenRepository;
 import com.example.education_platform.auth.repository.RefreshTokenRepository;
 import com.example.education_platform.auth.service.AuthService;
+import com.example.education_platform.auth.service.SelfRegistration;
 import com.example.education_platform.common.exception.BusinessException;
 import com.example.education_platform.common.exception.ConflictException;
 import com.example.education_platform.common.exception.InvalidRefreshTokenException;
@@ -16,6 +17,7 @@ import com.example.education_platform.mail.service.EmailService;
 import com.example.education_platform.security.JwtProperties;
 import com.example.education_platform.security.LoginRateLimiter;
 import com.example.education_platform.security.TokenService;
+import com.example.education_platform.subscription.entity.SchoolYear;
 import com.example.education_platform.user.entity.Role;
 import com.example.education_platform.user.entity.User;
 import com.example.education_platform.user.entity.UserStatus;
@@ -26,6 +28,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.HexFormat;
 import java.util.Locale;
@@ -40,6 +43,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
+    private static final DateTimeFormatter DAY = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
     private static final SecureRandom RANDOM = new SecureRandom();
     private static final java.time.Duration RESET_VALIDITY = java.time.Duration.ofHours(1);
 
@@ -52,6 +57,7 @@ public class AuthServiceImpl implements AuthService {
     private final LoginRateLimiter rateLimiter;
     private final PasswordResetTokenRepository resetTokens;
     private final EmailService emailService;
+    private final SelfRegistration selfRegistration;
 
     @Override
     @Transactional
@@ -76,6 +82,11 @@ public class AuthServiceImpl implements AuthService {
             throw new BusinessException(
                     "Votre compte est en attente de validation par votre professeur. Réessayez plus tard.");
         }
+        if (user.accessExpired(SchoolYear.today())) {
+            throw new BusinessException("Votre accès a pris fin le " + DAY.format(user.getAccessUntil())
+                    + ". Pour continuer, renouvelez votre abonnement depuis « Demander un accès », "
+                    + "avec la même adresse email.");
+        }
         return startSession(user, userAgent, ipAddress);
     }
 
@@ -88,6 +99,11 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public LoginResponse register(RegisterRequest request, String userAgent, String ipAddress) {
+        if (!selfRegistration.isEnabled()) {
+            // Every student is accepted by the admin: through a book, or a request with its plan
+            throw new BusinessException("Les inscriptions se font par « Demander un accès » : "
+                    + "votre professeur valide chaque demande.");
+        }
         String email = normalise(request.email());
         if (users.existsByEmail(email)) {
             // Said plainly on purpose: whoever is registering already knows this address is theirs,
@@ -111,6 +127,10 @@ public class AuthServiceImpl implements AuthService {
 
         // Rotation: the presented token dies with this call, so replaying it fails
         stored.revoke(now);
+        // An open session ends with the subscription: the next sign-in explains why
+        if (stored.getUser().accessExpired(SchoolYear.today())) {
+            throw new InvalidRefreshTokenException("Access has expired");
+        }
         return issueTokens(stored.getUser(), userAgent, ipAddress);
     }
 

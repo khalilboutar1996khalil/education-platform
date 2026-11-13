@@ -16,6 +16,7 @@ import com.example.education_platform.coupon.repository.CouponBatchRepository;
 import com.example.education_platform.coupon.repository.CouponRepository;
 import com.example.education_platform.coupon.service.CouponService;
 import com.example.education_platform.security.LoginRateLimiter;
+import com.example.education_platform.subscription.entity.SchoolYear;
 import com.example.education_platform.user.entity.Role;
 import com.example.education_platform.user.entity.User;
 import com.example.education_platform.user.entity.UserStatus;
@@ -135,7 +136,10 @@ public class CouponServiceImpl implements CouponService {
     @Override
     @Transactional
     public void approve(Long couponId) {
-        pendingCoupon(couponId).getRedeemedBy().setStatus(UserStatus.ACTIVE);
+        User student = pendingCoupon(couponId).getRedeemedBy();
+        student.setStatus(UserStatus.ACTIVE);
+        // A book is worth the school year it was bought for
+        student.setAccessUntil(SchoolYear.endOf(SchoolYear.today()));
     }
 
     @Override

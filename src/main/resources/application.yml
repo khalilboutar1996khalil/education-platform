@@ -63,6 +63,10 @@ springdoc:
     path: /swagger-ui.html
 
 app:
+  auth:
+    # Students join through a book coupon or an access request the admin accepts; letting them sign
+    # themselves up would skip that check (and the subscription). Only tests turn this on.
+    self-registration-enabled: ${SELF_REGISTRATION_ENABLED:false}
   mail:
     from: ${APP_MAIL_FROM:no-reply@eduflow.dz}
     from-name: ${APP_MAIL_FROM_NAME:EduFlow}

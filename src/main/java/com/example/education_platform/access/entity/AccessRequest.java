@@ -1,6 +1,8 @@
 package com.example.education_platform.access.entity;
 
 import com.example.education_platform.common.BaseEntity;
+import com.example.education_platform.subscription.entity.PaymentMethod;
+import com.example.education_platform.subscription.entity.SubscriptionPlan;
 import com.example.education_platform.user.entity.Level;
 import com.example.education_platform.user.entity.User;
 import jakarta.persistence.Column;
@@ -11,6 +13,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
 import java.time.Instant;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -61,11 +64,48 @@ public class AccessRequest extends BaseEntity {
     @Column(length = 1000)
     private String decisionNote;
 
+    /** The plan paid for; null for a level that has no plan, whose request stays free. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "plan_id")
+    private SubscriptionPlan plan;
+
+    /** Copied from the plan when asking, so a later price change does not rewrite this request. */
+    @Column(name = "price_dt", precision = 10, scale = 3)
+    private BigDecimal price;
+
+    private Integer durationDays;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private PaymentMethod paymentMethod;
+
+    /** The D17 transaction number or transfer reference the admin checks against their account. */
+    @Column(length = 100)
+    private String paymentReference;
+
+    /** Set when an existing student renews: accepting extends this account instead of creating one. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "renewal_of_id")
+    private User renewalOf;
+
     public AccessRequest(String fullName, String email, Level level, String message) {
         this.fullName = fullName;
         this.email = email;
         this.level = level;
         this.message = message;
+    }
+
+    /** Records the plan chosen and how it was paid, at today's price. */
+    public void subscribe(SubscriptionPlan chosen, PaymentMethod method, String reference) {
+        this.plan = chosen;
+        this.price = chosen.getPrice();
+        this.durationDays = chosen.getDurationDays();
+        this.paymentMethod = method;
+        this.paymentReference = reference;
+    }
+
+    public boolean isRenewal() {
+        return renewalOf != null;
     }
 
     public boolean isPending() {
