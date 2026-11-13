@@ -2,12 +2,14 @@ package com.example.education_platform.level;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.example.education_platform.auth.service.SelfRegistration;
 import com.example.education_platform.user.entity.Level;
 import com.example.education_platform.user.entity.Role;
 import com.example.education_platform.user.entity.User;
 import com.example.education_platform.user.repository.UserRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +22,24 @@ import org.springframework.test.web.servlet.assertj.MvcTestResult;
 import org.springframework.transaction.annotation.Transactional;
 
 /** Levels are data the admin manages: a new class year needs no release. */
-@SpringBootTest(properties = "app.auth.self-registration-enabled=true")
+@SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
 class LevelApiIntegrationTest {
+
+    @Autowired
+    private SelfRegistration selfRegistration;
+
+    @BeforeEach
+    void allowSelfRegistration() {
+        // Off in production; these tests exercise the endpoint itself
+        selfRegistration.setEnabled(true);
+    }
+
+    @AfterEach
+    void restoreSelfRegistration() {
+        selfRegistration.setEnabled(false);
+    }
 
     private static final ObjectMapper JSON = new ObjectMapper();
     private static final String PASSWORD = "Correct-Horse-1";

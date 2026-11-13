@@ -9,6 +9,7 @@ import com.example.education_platform.auth.entity.RefreshToken;
 import com.example.education_platform.auth.repository.PasswordResetTokenRepository;
 import com.example.education_platform.auth.repository.RefreshTokenRepository;
 import com.example.education_platform.auth.service.AuthService;
+import com.example.education_platform.auth.service.SelfRegistration;
 import com.example.education_platform.common.exception.BusinessException;
 import com.example.education_platform.common.exception.ConflictException;
 import com.example.education_platform.common.exception.InvalidRefreshTokenException;
@@ -33,7 +34,6 @@ import java.util.HexFormat;
 import java.util.Locale;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -57,10 +57,7 @@ public class AuthServiceImpl implements AuthService {
     private final LoginRateLimiter rateLimiter;
     private final PasswordResetTokenRepository resetTokens;
     private final EmailService emailService;
-
-    /** Off in production: a student signing themselves up would skip the admin's approval. */
-    @Value("${app.auth.self-registration-enabled:false}")
-    private boolean selfRegistrationEnabled;
+    private final SelfRegistration selfRegistration;
 
     @Override
     @Transactional
@@ -102,7 +99,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public LoginResponse register(RegisterRequest request, String userAgent, String ipAddress) {
-        if (!selfRegistrationEnabled) {
+        if (!selfRegistration.isEnabled()) {
             // Every student is accepted by the admin: through a book, or a request with its plan
             throw new BusinessException("Les inscriptions se font par « Demander un accès » : "
                     + "votre professeur valide chaque demande.");
