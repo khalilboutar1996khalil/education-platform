@@ -12,13 +12,13 @@ import org.springframework.data.repository.query.Param;
 
 public interface AccessRequestRepository extends JpaRepository<AccessRequest, Long> {
 
-    @EntityGraph(attributePaths = {"reviewedBy", "createdUser", "renewalOf"})
+    @EntityGraph(attributePaths = {"reviewedBy", "createdUser", "renewalOf", "receipt"})
     Optional<AccessRequest> findDetailById(Long id);
 
     /** Stops one address filing the same request repeatedly while it waits for an answer. */
     boolean existsByEmailIgnoreCaseAndStatus(String email, AccessRequestStatus status);
 
-    @EntityGraph(attributePaths = {"reviewedBy", "createdUser", "renewalOf"})
+    @EntityGraph(attributePaths = {"reviewedBy", "createdUser", "renewalOf", "receipt"})
     @Query("""
             select r from AccessRequest r
             where :status is null or r.status = :status

@@ -12,6 +12,7 @@ import com.example.education_platform.user.repository.UserRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.Month;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
@@ -155,6 +157,52 @@ class SubscriptionApiIntegrationTest {
         assertThat(end).isAfterOrEqualTo(SchoolYear.today());
     }
 
+    // ---------- the receipt ----------
+
+    @Test
+    void aReceiptCanReplaceTheTypedReferenceAndTheAdminDownloadsIt() throws Exception {
+        savePlan("SEVENTH_BASE", "100", true);
+        byte[] photo = "fake-jpeg-bytes".getBytes(StandardCharsets.UTF_8);
+
+        assertThat(submitWithReceipt("yacine@eduflow.tn", "D17", null,
+                new MockMultipartFile("receipt", "recu-d17.jpg", "image/jpeg", photo))).hasStatus(202);
+
+        JsonNode queue = bodyOf(get("/api/v1/access-requests?status=PENDING", token(ADMIN)), 200);
+        assertThat(queue.at("/content/0/receiptName").asText()).isEqualTo("recu-d17.jpg");
+        assertThat(queue.at("/content/0/paymentReference").isNull()).isTrue();
+
+        MvcTestResult download = get("/api/v1/access-requests/" + firstRequestId() + "/receipt", token(ADMIN));
+        assertThat(download).hasStatus(200);
+        assertThat(download.getResponse().getContentAsByteArray()).isEqualTo(photo);
+        assertThat(get("/api/v1/access-requests/" + firstRequestId() + "/receipt", token(STUDENT)))
+                .describedAs("a receipt is for the admin only").hasStatus(403);
+    }
+
+    @Test
+    void aReceiptThatIsNotAPhotoOrAPdfIsRefused() {
+        savePlan("SEVENTH_BASE", "100", true);
+
+        assertThat(submitWithReceipt("yacine@eduflow.tn", "D17", "TX-1",
+                new MockMultipartFile("receipt", "virus.zip", "application/zip", new byte[] {1, 2})))
+                .hasStatus(422);
+        assertThat(requests.count()).isZero();
+    }
+
+    @Test
+    void withNeitherReceiptNorReferenceThePaidRequestIsRefused() {
+        savePlan("SEVENTH_BASE", "100", true);
+
+        assertThat(submitWithReceipt("yacine@eduflow.tn", "D17", null, null)).hasStatus(422);
+    }
+
+    @Test
+    void aRequestWithoutAReceiptHasNoneToDownload() {
+        savePlan("SEVENTH_BASE", "100", true);
+        submit("Yacine Cherif", "yacine@eduflow.tn", "SEVENTH_BASE", "D17", "TX-1");
+
+        assertThat(get("/api/v1/access-requests/" + firstRequestId() + "/receipt", token(ADMIN))).hasStatus(404);
+    }
+
     // ---------- the end of access ----------
 
     @Test
@@ -274,6 +322,17 @@ class SubscriptionApiIntegrationTest {
                 ,"paymentMethod":"%s","paymentReference":"%s\"""".formatted(method, reference);
         return post("/api/v1/access-requests", null, """
                 {"fullName":"%s","email":"%s","level":"%s"%s}""".formatted(fullName, email, level, payment));
+    }
+
+    private MvcTestResult submitWithReceipt(String email, String method, String reference, MockMultipartFile receipt) {
+        String ref = reference == null ? "" : """
+                ,"paymentReference":"%s\"""".formatted(reference);
+        String json = """
+                {"fullName":"Yacine Cherif","email":"%s","level":"SEVENTH_BASE","paymentMethod":"%s"%s}"""
+                .formatted(email, method, ref);
+        var request = mvc.post().uri("/api/v1/access-requests").multipart()
+                .file(new MockMultipartFile("request", "", "application/json", json.getBytes(StandardCharsets.UTF_8)));
+        return (receipt == null ? request : request.file(receipt)).exchange();
     }
 
     private MvcTestResult login(String email, String password) {

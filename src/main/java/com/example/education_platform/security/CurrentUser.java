@@ -2,6 +2,7 @@ package com.example.education_platform.security;
 
 import com.example.education_platform.user.entity.User;
 import com.example.education_platform.user.repository.UserRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.Authentication;
@@ -15,6 +16,15 @@ import org.springframework.stereotype.Component;
 public class CurrentUser {
 
     private final UserRepository users;
+
+    /** The signed-in user, or empty on a public endpoint. */
+    public Optional<User> find() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!(authentication instanceof JwtAuthenticationToken jwt)) {
+            return Optional.empty();
+        }
+        return users.findById(Long.valueOf(jwt.getToken().getSubject()));
+    }
 
     public User get() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
