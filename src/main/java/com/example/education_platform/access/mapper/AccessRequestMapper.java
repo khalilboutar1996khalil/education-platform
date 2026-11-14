@@ -10,5 +10,6 @@ import org.mapstruct.Mapping;
 public interface AccessRequestMapper {
 
     @Mapping(target = "submittedAt", source = "createdAt")
+    @Mapping(target = "receiptName", source = "receipt.originalFilename")
     AccessRequestResponse toResponse(AccessRequest request);
 }

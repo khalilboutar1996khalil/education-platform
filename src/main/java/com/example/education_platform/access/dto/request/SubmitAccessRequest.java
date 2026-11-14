@@ -29,7 +29,7 @@ public record SubmitAccessRequest(
         /** Required when the level has a plan: how the student paid. */
         PaymentMethod paymentMethod,
 
-        /** Required when the level has a plan: the D17 transaction number or transfer reference. */
+        /** The D17 transaction number or transfer reference; optional when a receipt is attached. */
         @Size(max = 100, message = "La référence ne peut pas dépasser 100 caractères")
         String paymentReference) {
 }

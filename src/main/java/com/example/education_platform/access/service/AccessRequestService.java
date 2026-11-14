@@ -5,7 +5,9 @@ import com.example.education_platform.access.dto.response.AccessRequestResponse;
 import com.example.education_platform.access.dto.response.ApprovedAccessResponse;
 import com.example.education_platform.access.entity.AccessRequestStatus;
 import com.example.education_platform.common.PageResponse;
+import com.example.education_platform.storage.service.DownloadableFile;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface AccessRequestService {
 
@@ -14,6 +16,12 @@ public interface AccessRequestService {
      * account" would let anyone test which addresses are registered.
      */
     void submit(SubmitAccessRequest request);
+
+    /** The same, with the receipt of the payment (a photo or a PDF); {@code receipt} may be null. */
+    void submit(SubmitAccessRequest request, MultipartFile receipt);
+
+    /** Admin: the receipt attached to a request. */
+    DownloadableFile receipt(Long id);
 
     PageResponse<AccessRequestResponse> list(AccessRequestStatus status, Pageable pageable);
 

@@ -42,7 +42,8 @@ public class StoredFile extends BaseEntity {
     @Column(nullable = false, length = 64)
     private String checksum;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    /** Null for the one public upload: a payment receipt sent with an access request. */
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "uploaded_by_id")
     private User uploadedBy;
 

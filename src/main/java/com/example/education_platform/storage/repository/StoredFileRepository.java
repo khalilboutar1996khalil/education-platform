@@ -20,6 +20,7 @@ public interface StoredFileRepository extends JpaRepository<StoredFile, Long> {
               and not exists (select 1 from Submission s join s.files sf where sf = f)
               and not exists (select 1 from Resource r where r.file = f)
               and not exists (select 1 from BlogPost p where p.cover = f)
+              and not exists (select 1 from AccessRequest q where q.receipt = f)
             """)
     List<StoredFile> findOrphansOlderThan(@Param("before") Instant before);
 }

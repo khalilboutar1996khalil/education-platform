@@ -10,6 +10,7 @@ import java.time.Instant;
 /**
  * @param createdUser the account an approval produced (or renewed); null while pending or once refused
  * @param price       what the plan cost when the student asked; null for a free request
+ * @param receiptName filename of the attached receipt, downloaded from {@code /{id}/receipt}; null if none
  * @param renewal     an existing student extending their access rather than a new account
  */
 public record AccessRequestResponse(
@@ -28,5 +29,6 @@ public record AccessRequestResponse(
         Integer durationDays,
         PaymentMethod paymentMethod,
         String paymentReference,
+        String receiptName,
         boolean renewal) {
 }

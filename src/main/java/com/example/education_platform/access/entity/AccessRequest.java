@@ -1,6 +1,7 @@
 package com.example.education_platform.access.entity;
 
 import com.example.education_platform.common.BaseEntity;
+import com.example.education_platform.storage.entity.StoredFile;
 import com.example.education_platform.subscription.entity.PaymentMethod;
 import com.example.education_platform.subscription.entity.SubscriptionPlan;
 import com.example.education_platform.user.entity.Level;
@@ -82,6 +83,11 @@ public class AccessRequest extends BaseEntity {
     /** The D17 transaction number or transfer reference the admin checks against their account. */
     @Column(length = 100)
     private String paymentReference;
+
+    /** The receipt of the payment, when the student attached one. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "receipt_file_id")
+    private StoredFile receipt;
 
     /** Set when an existing student renews: accepting extends this account instead of creating one. */
     @ManyToOne(fetch = FetchType.LAZY)

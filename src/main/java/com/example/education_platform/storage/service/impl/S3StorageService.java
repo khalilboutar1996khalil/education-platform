@@ -78,7 +78,7 @@ public class S3StorageService implements StorageService {
                     RequestBody.fromFile(temp));
 
             StoredFile stored = new StoredFile(originalFilename, file.getContentType(), written,
-                    storageKey, HexFormat.of().formatHex(digest.digest()), currentUser.get());
+                    storageKey, HexFormat.of().formatHex(digest.digest()), currentUser.find().orElse(null));
             return storedFiles.save(stored);
         } catch (IOException e) {
             throw new UncheckedIOException("Could not read the uploaded file", e);

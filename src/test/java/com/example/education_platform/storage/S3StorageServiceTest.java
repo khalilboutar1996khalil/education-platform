@@ -16,6 +16,7 @@ import com.example.education_platform.storage.service.impl.S3StorageService;
 import com.example.education_platform.user.entity.User;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -41,7 +42,7 @@ class S3StorageServiceTest {
                 List.of("application/pdf"), "s3",
                 new StorageProperties.S3("https://example.r2.cloudflarestorage.com", "auto", "eduflow",
                         "key", "secret"));
-        when(currentUser.get()).thenReturn(new User());
+        when(currentUser.find()).thenReturn(Optional.of(new User()));
         when(storedFiles.save(any(StoredFile.class))).thenAnswer(inv -> inv.getArgument(0));
         storage = new S3StorageService(properties, storedFiles, currentUser, s3);
     }
