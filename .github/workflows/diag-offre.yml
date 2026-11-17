@@ -1,0 +1,12 @@
+name: Diag offre prod
+on:
+  push:
+    branches: [diag/offre-prod]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          for u in https://eduflow-api-iqq9.onrender.com/api/v1/subscriptions/offer https://education-platform-front.vercel.app/api/v1/subscriptions/offer https://eduflow-api-iqq9.onrender.com/api/v1/levels; do
+            echo "== $u"; curl -s -m 120 -w "\nHTTP %{http_code}\n" "$u" | head -c 3000; echo; done
+          echo "== front tarifs in bundle"; curl -s https://education-platform-front.vercel.app/ | grep -o 'main-[A-Z0-9]*\.js' | head -1
