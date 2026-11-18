@@ -6,7 +6,7 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - run: pip install -q numpy
+      - run: sudo apt-get install -y -qq ffmpeg >/dev/null && pip install -q numpy
       - run: |
           cat > f0.py <<'PY'
           import sys, wave, numpy as np
