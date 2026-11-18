@@ -7,6 +7,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          for u in https://eduflow-api-iqq9.onrender.com/api/v1/subscriptions/offer https://education-platform-front.vercel.app/api/v1/subscriptions/offer https://eduflow-api-iqq9.onrender.com/api/v1/levels; do
-            echo "== $u"; curl -s -m 120 -w "\nHTTP %{http_code}\n" "$u" | head -c 3000; echo; done
-          echo "== front tarifs in bundle"; curl -s https://education-platform-front.vercel.app/ | grep -o 'main-[A-Z0-9]*\.js' | head -1
+          for c in 7-1-1 7-r1; do curl -sI "https://education-platform-front.vercel.app/videos/7eme/$c.mp4?v=3" | grep -iE "^HTTP|content-length" | tr -d '\r' | tr '\n' ' '; echo " <- $c"; done
